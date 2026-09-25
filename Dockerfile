@@ -7,13 +7,14 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PORT=8000 \
     BMS_HOST=0.0.0.0 \
     BMS_AUTO_OPEN_BROWSER=false \
-    BMS_DATABASE_PATH=/data/bms.sqlite3
+    BMS_DATABASE_PATH=/data/bms.sqlite3 \
+    BMS_UPLOADS_PATH=/data/uploads
 
 WORKDIR /app
 
 # Create non-root runtime user and data directory
 RUN useradd -u 1000 -m bmsuser && \
-    mkdir -p /data /app/uploads && \
+    mkdir -p /data/uploads /app/uploads && \
     chown -R bmsuser:bmsuser /data /app
 
 # Install dependencies

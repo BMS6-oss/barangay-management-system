@@ -39,6 +39,7 @@ except ImportError:
 
 ROOT = config.ROOT_DIR
 DB_PATH = config.DATABASE_PATH
+UPLOADS_DIR = config.UPLOADS_DIR
 TOKENS = {}
 GOOGLE_STATES = {}
 RATE_LIMIT_STATE = {}
@@ -1030,19 +1031,19 @@ def process_and_save_image(base64_data, category='officials', connection=None, a
     filename = f"{category}_{timestamp_str}_{token_hex}{ext}"
 
     if category == 'residents':
-        dest_dir = ROOT / 'uploads' / 'residents'
+        dest_dir = UPLOADS_DIR / 'residents'
         dest_dir.mkdir(parents=True, exist_ok=True)
         (dest_dir / filename).write_bytes(raw_bytes)
         rel_path = f"uploads/residents/{filename}"
         return rel_path, rel_path
 
     # Public categories: officials, gallery
-    orig_dir = ROOT / 'uploads' / category / 'original'
+    orig_dir = UPLOADS_DIR / category / 'original'
     orig_dir.mkdir(parents=True, exist_ok=True)
     (orig_dir / filename).write_bytes(raw_bytes)
     orig_rel_path = f"./uploads/{category}/original/{filename}"
 
-    pub_dir = ROOT / 'uploads' / category / 'public'
+    pub_dir = UPLOADS_DIR / category / 'public'
     pub_dir.mkdir(parents=True, exist_ok=True)
     pub_filename = f"{category}_{timestamp_str}_{token_hex}_wm{ext}"
     pub_path = pub_dir / pub_filename
@@ -2794,7 +2795,7 @@ class Handler(BaseHTTPRequestHandler):
             if not is_valid_image:
                 return json_response(self, 400, {'error': 'Invalid image format. Must be a valid JPG, PNG, or WebP file.'})
 
-            upload_dir = ROOT / 'uploads' / 'branding' / 'hero'
+            upload_dir = UPLOADS_DIR / 'branding' / 'hero'
             upload_dir.mkdir(parents=True, exist_ok=True)
 
             timestamp_str = datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')
@@ -2821,7 +2822,7 @@ class Handler(BaseHTTPRequestHandler):
                         opacity=ps['watermarkOpacity'],
                         position=ps['watermarkPosition'],
                     )
-                    protected_dir = ROOT / 'uploads' / 'protected' / 'hero'
+                    protected_dir = UPLOADS_DIR / 'protected' / 'hero'
                     protected_dir.mkdir(parents=True, exist_ok=True)
                     protected_filename = f'hero_{timestamp_str}_{token_hex}_wm{ext}'
                     protected_path = protected_dir / protected_filename
@@ -4539,9 +4540,15 @@ class Handler(BaseHTTPRequestHandler):
 
     def serve_static(self):
         relative = urlparse(self.path).path.lstrip('/') or 'index.html'
-        target = (ROOT / relative).resolve()
-        if ROOT not in target.parents and target != ROOT:
-            return json_response(self, 404, {'error': 'Not found'})
+        if relative.startswith('uploads/'):
+            subpath = relative.removeprefix('uploads/')
+            target = (UPLOADS_DIR / subpath).resolve()
+            if UPLOADS_DIR not in target.parents and target != UPLOADS_DIR:
+                return json_response(self, 404, {'error': 'Not found'})
+        else:
+            target = (ROOT / relative).resolve()
+            if ROOT not in target.parents and target != ROOT:
+                return json_response(self, 404, {'error': 'Not found'})
             
         # Security Boundary: Never serve database files, backend code, credentials, or logs to the browser
         blocked_exts = ('.sqlite3', '.db', '.sqlite', '.sqlite3-journal', '.backup', '.py', '.bat', '.vbs', '.sh', '.log', '.env')

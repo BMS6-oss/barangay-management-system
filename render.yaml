@@ -20,6 +20,8 @@ services:
         value: "true"
       - key: BMS_DATABASE_PATH
         value: /data/bms.sqlite3
+      - key: BMS_UPLOADS_PATH
+        value: /data/uploads
       - key: APP_URL
         sync: false
       - key: BMS_ALLOWED_ORIGINS

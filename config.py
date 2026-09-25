@@ -59,6 +59,20 @@ try:
 except Exception:
     pass
 
+# Uploads directory configuration (supports persistent disk mount in Docker/Render)
+_uploads_env = os.getenv('BMS_UPLOADS_PATH', os.getenv('UPLOADS_PATH', ''))
+if _uploads_env:
+    UPLOADS_DIR = Path(_uploads_env).resolve()
+else:
+    UPLOADS_DIR = (ROOT_DIR / 'uploads').resolve()
+
+for _sub in ('residents', 'branding/hero', 'gallery', 'officials', 'protected/hero'):
+    try:
+        (UPLOADS_DIR / _sub).mkdir(parents=True, exist_ok=True)
+    except Exception:
+        pass
+
+
 # Browser auto-opening configuration (disabled by default in cloud/Docker environments)
 _is_container_or_cloud = bool(os.getenv('RENDER') or os.getenv('DOCKER') or os.getenv('PORT'))
 _default_auto_open = 'false' if _is_container_or_cloud else 'true'
