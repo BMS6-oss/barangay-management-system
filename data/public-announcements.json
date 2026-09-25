@@ -1,0 +1,20 @@
+{
+  "announcements": [
+    {
+      "id": "ann-pub-01",
+      "title": "Barangay Public Assistance & Service Desk Hours",
+      "body": "The Barangay Hall is open Monday through Friday from 8:00 AM to 5:00 PM for document clearances, barangay certifications, and citizen assistance.",
+      "category": "Advisory",
+      "priority": "Normal",
+      "created_at": "Regular Advisory"
+    },
+    {
+      "id": "ann-pub-02",
+      "title": "Disaster Preparedness & 24/7 Emergency Hotlines",
+      "body": "For urgent medical assistance, emergency response, or fire dispatch, please dial 117 / 911 or contact the Barangay Emergency Operations Desk.",
+      "category": "Public Safety",
+      "priority": "High",
+      "created_at": "Official Bulletin"
+    }
+  ]
+}

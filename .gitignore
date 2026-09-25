@@ -1,0 +1,57 @@
+# =====================================================================
+# Git Ignore Configuration for Barangay Management System (BMS)
+# =====================================================================
+
+# Server-side secrets and local environment overrides
+.env
+.env.*
+!.env.example
+
+# Local databases, journals, locks, and backups (Never commit production/test user data)
+*.sqlite
+*.sqlite3
+*.sqlite3*
+*.sqlite3-journal
+*.sqlite3-wal
+*.sqlite3-shm
+*.db
+bms.db
+bms.*.sqlite3
+
+# Runtime logs and server outputs
+*.log
+bms_server.log
+
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# IDE and editor settings
+.vscode/
+.idea/
+*.suo
+*.user
+
+# Operating system files
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# User-uploaded files (keep folder structure via .gitkeep)
+uploads/residents/*
+!uploads/residents/.gitkeep
+uploads/branding/hero/*
+!uploads/branding/hero/.gitkeep
+uploads/gallery/*
+!uploads/gallery/.gitkeep
+uploads/officials/*
+!uploads/officials/.gitkeep
+uploads/protected/*
+!uploads/protected/.gitkeep
+
+# Temporary scratch and draft files
+BMS_NEW*
+_inspect_db*
+

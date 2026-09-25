@@ -1,0 +1,37 @@
+{
+  "programs": [
+    {
+      "event_id": "prog-pub-01",
+      "title": "Community Health & Wellness Program",
+      "description": "Comprehensive primary healthcare consultations, preventive check-ups, and maternal-child health advisories at the Barangay Health Station.",
+      "event_date": "Regular Community Schedule",
+      "start_time": "8:00 AM",
+      "end_time": "5:00 PM",
+      "location": "Barangay Health Center",
+      "organizer": "Barangay Health Committee",
+      "status": "Ongoing"
+    },
+    {
+      "event_id": "prog-pub-02",
+      "title": "Solid Waste Management & Green Initiative",
+      "description": "Community-wide ecological waste segregation campaign, clean-up drives, and urban gardening workshops for residents.",
+      "event_date": "Regular Community Schedule",
+      "start_time": "7:00 AM",
+      "end_time": "11:00 AM",
+      "location": "Barangay Plaza & Key Streets",
+      "organizer": "Committee on Environment",
+      "status": "Scheduled"
+    },
+    {
+      "event_id": "prog-pub-03",
+      "title": "Youth Leadership & Skills Development Workshop",
+      "description": "Educational development, digital literacy training, and civic engagement workshops organized by the Sangguniang Kabataan.",
+      "event_date": "Regular Community Schedule",
+      "start_time": "9:00 AM",
+      "end_time": "3:00 PM",
+      "location": "Barangay Multi-Purpose Hall",
+      "organizer": "Sangguniang Kabataan (SK)",
+      "status": "Scheduled"
+    }
+  ]
+}

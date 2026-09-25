@@ -1,0 +1,36 @@
+# Render Blueprint Specification for Barangay Management System (BMS)
+# https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: barangay-management-system
+    runtime: docker
+    plan: starter
+    region: oregon
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: BMS_HOST
+        value: 0.0.0.0
+      - key: BMS_AUTO_OPEN_BROWSER
+        value: "false"
+      - key: BMS_REQUIRE_HTTPS
+        value: "true"
+      - key: BMS_DATABASE_PATH
+        value: /data/bms.sqlite3
+      - key: APP_URL
+        sync: false
+      - key: BMS_ALLOWED_ORIGINS
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_REDIRECT_URI
+        sync: false
+    disk:
+      name: bms-data
+      mountPath: /data
+      sizeGB: 1

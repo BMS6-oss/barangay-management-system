@@ -1,0 +1,43 @@
+# Version control
+.git
+.gitignore
+.dockerignore
+
+# Environment & secrets
+.env
+.env.*
+!.env.example
+
+# Logs & temp files
+*.log
+bms_server.log
+__pycache__/
+*.py[cod]
+.vscode/
+
+# Local databases & backups (production uses mounted volume or initializes clean schema)
+*.sqlite
+*.sqlite3
+*.sqlite3*
+*.db
+bms.db
+
+# Windows-specific launcher scripts
+*.bat
+*.vbs
+
+# Test and development scripts
+test_*.py
+test_*.js
+acceptance_test.py
+check_users.py
+fix_passwords.py
+inspect_db.py
+inspect_sections.py
+reset.py
+verify_logins.py
+_inspect_db
+
+# Temporary drafts
+BMS_NEW*.html
+BMS_NEW*.txt
