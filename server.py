@@ -750,7 +750,12 @@ def init_db():
 def add_cors_headers(handler):
     """Grant CORS only to explicitly configured browser origins."""
     origin = handler.headers.get('Origin', '').strip().rstrip('/')
-    if origin and origin in config.ALLOWED_ORIGINS:
+    is_allowed = bool(origin and (
+        origin in config.ALLOWED_ORIGINS or
+        origin == 'https://bms6-oss.github.io' or
+        origin.endswith('.github.io')
+    ))
+    if is_allowed:
         handler.send_header('Access-Control-Allow-Origin', origin)
         handler.send_header('Vary', 'Origin')
     elif not origin and config.ALLOWED_ORIGINS:

@@ -9,24 +9,66 @@ window.BMSSQLite = (() => {
         : '';
     
     // Dynamic Origin Detection:
-    // 1. Configured via window.BMS_API_BASE_URL or window.__BMS_CONFIG__.API_BASE_URL
-    // 2. Configured via <meta name="bms-api-base-url" content="...">
-    // 3. Defaults to window.location.origin when served over HTTP/HTTPS (same-origin production standard)
-    // 4. Defaults to http://127.0.0.1:8000 when opened via local file protocol or test runners
+    // 1. Configured dynamically via localStorage ('bmsApiBaseUrl')
+    // 2. Configured via window.BMS_API_BASE_URL or window.__BMS_CONFIG__.API_BASE_URL
+    // 3. Configured via <meta name="bms-api-base-url" content="...">
+    // 4. Detected static hosting (e.g. GitHub Pages) -> falls back to production cloud API
+    // 5. Defaults to window.location.origin when served over same-origin HTTP/HTTPS
+    // 6. Defaults to http://127.0.0.1:8000 when opened via local file protocol or local static dev servers
     function resolveApiBaseUrl() {
         if (typeof window !== 'undefined') {
-            if (window.BMS_API_BASE_URL && typeof window.BMS_API_BASE_URL === 'string') {
-                return window.BMS_API_BASE_URL.replace(/\/+$/, '');
+            // 1. Check dynamic runtime override in localStorage
+            try {
+                const stored = window.localStorage && window.localStorage.getItem('bmsApiBaseUrl');
+                if (stored && typeof stored === 'string' && stored.trim()) {
+                    return stored.trim().replace(/\/+$/, '');
+                }
+            } catch (_) {}
+
+            // 2. Check window.BMS_API_BASE_URL global
+            if (window.BMS_API_BASE_URL && typeof window.BMS_API_BASE_URL === 'string' && window.BMS_API_BASE_URL.trim()) {
+                return window.BMS_API_BASE_URL.trim().replace(/\/+$/, '');
             }
-            if (window.__BMS_CONFIG__ && typeof window.__BMS_CONFIG__.API_BASE_URL === 'string') {
-                return window.__BMS_CONFIG__.API_BASE_URL.replace(/\/+$/, '');
+
+            // 3. Check window.__BMS_CONFIG__.API_BASE_URL (must be non-empty)
+            if (window.__BMS_CONFIG__ && typeof window.__BMS_CONFIG__.API_BASE_URL === 'string' && window.__BMS_CONFIG__.API_BASE_URL.trim()) {
+                return window.__BMS_CONFIG__.API_BASE_URL.trim().replace(/\/+$/, '');
             }
+
+            // 4. Check <meta name="bms-api-base-url"> tag
             const metaTag = document.querySelector('meta[name="bms-api-base-url"]');
-            if (metaTag && metaTag.content) {
-                return metaTag.content.replace(/\/+$/, '');
+            if (metaTag && metaTag.content && metaTag.content.trim()) {
+                return metaTag.content.trim().replace(/\/+$/, '');
             }
-            if (window.location && (window.location.protocol === 'http:' || window.location.protocol === 'https:')) {
-                return window.location.origin;
+
+            // 5. Intelligent Environment & Origin Detection
+            if (window.location) {
+                const hostname = (window.location.hostname || '').toLowerCase();
+                const protocol = (window.location.protocol || '').toLowerCase();
+
+                // Static host detection (e.g., GitHub Pages or raw git CDN):
+                // Static web servers cannot execute Python or accept POST requests.
+                // Redirect API calls to the production cloud backend (Render).
+                if (hostname.endsWith('github.io') || hostname === 'raw.githubusercontent.com') {
+                    const cloudUrl = (window.__BMS_CONFIG__ && window.__BMS_CONFIG__.CLOUD_API_URL)
+                        || 'https://barangay-management-system.onrender.com';
+                    return cloudUrl.replace(/\/+$/, '');
+                }
+
+                // If running locally from file:// protocol, connect to local backend server
+                if (protocol === 'file:') {
+                    return 'http://127.0.0.1:8000';
+                }
+
+                // If running from a local static dev server (like VS Code Live Server on port 5500, 3000, 5173, etc.)
+                if ((hostname === 'localhost' || hostname === '127.0.0.1') && window.location.port && window.location.port !== '8000') {
+                    return 'http://127.0.0.1:8000';
+                }
+
+                // Standard same-origin hosting (e.g., Render Docker web service or local server.py)
+                if (protocol === 'http:' || protocol === 'https:') {
+                    return window.location.origin;
+                }
             }
         }
         return 'http://127.0.0.1:8000';
@@ -73,12 +115,27 @@ window.BMSSQLite = (() => {
         if (!response.ok) {
             let msg = payload.error || '';
             let code = 'HTTP_ERROR';
-            if (response.status === 401) { msg = 'Invalid username or password.'; code = 'UNAUTHORIZED'; }
-            else if (response.status === 403) { msg = msg || 'Access denied. You do not have permission for this action.'; code = 'FORBIDDEN'; }
-            else if (response.status === 404) { msg = 'The requested service endpoint was not found.'; code = 'ENDPOINT_NOT_FOUND'; }
-            else if (response.status === 503) { msg = msg || 'BMS server is starting or database is initializing...'; code = payload.code || 'SERVICE_UNAVAILABLE'; }
-            else if (response.status >= 500) { msg = 'The BMS server encountered an internal error.'; code = 'DATABASE_ERROR'; }
-            else if (!msg) msg = `Request failed (${response.status})`;
+            if (response.status === 401) {
+                msg = 'Invalid username or password.';
+                code = 'UNAUTHORIZED';
+            } else if (response.status === 403) {
+                msg = msg || 'Access denied. You do not have permission for this action.';
+                code = 'FORBIDDEN';
+            } else if (response.status === 404) {
+                msg = 'The requested service endpoint was not found.';
+                code = 'ENDPOINT_NOT_FOUND';
+            } else if (response.status === 405) {
+                msg = 'The authentication service received an unsupported method or request was routed to a static host. Please ensure the BMS backend server is connected.';
+                code = 'METHOD_NOT_ALLOWED';
+            } else if (response.status === 503) {
+                msg = msg || 'BMS server is starting or database is initializing...';
+                code = payload.code || 'SERVICE_UNAVAILABLE';
+            } else if (response.status >= 500) {
+                msg = 'The BMS server encountered an internal error.';
+                code = 'DATABASE_ERROR';
+            } else if (!msg) {
+                msg = `Unable to complete request (${response.status}). Please try again.`;
+            }
 
             const httpErr = new Error(msg);
             httpErr.code = payload.code || code;
@@ -113,7 +170,13 @@ window.BMSSQLite = (() => {
         },
         setBaseUrl(url) {
             if (typeof url === 'string') {
-                apiBaseUrl = url.replace(/\/+$/, '');
+                apiBaseUrl = url.trim().replace(/\/+$/, '');
+                try {
+                    if (window.localStorage) {
+                        if (apiBaseUrl) window.localStorage.setItem('bmsApiBaseUrl', apiBaseUrl);
+                        else window.localStorage.removeItem('bmsApiBaseUrl');
+                    }
+                } catch (_) {}
             }
         },
         onConnectionChange(callback) {

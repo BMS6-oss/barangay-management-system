@@ -3064,6 +3064,17 @@
             </form>
             <button type="button" class="btn btn-secondary" style="width:100%; margin-top:0.75rem;"
                 onclick="openModal('registrationModal')">📝 Create Resident Account</button>
+            <div style="text-align: center; margin-top: 0.75rem;">
+                <button type="button" id="toggleApiSettingsBtn" style="background: none; border: none; color: #64748b; font-size: 0.75rem; cursor: pointer; text-decoration: underline;" onclick="toggleApiSettings()">⚙️ API Server Connection</button>
+            </div>
+            <div id="apiConfigPanel" style="display: none; margin-top: 0.5rem; padding: 0.75rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 0.8rem; text-align: left;">
+                <label style="display:block; margin-bottom: 0.25rem; font-weight: 600; color: #334155;">API Base URL:</label>
+                <div style="display:flex; gap: 0.5rem;">
+                    <input type="text" id="customApiUrlInput" placeholder="https://barangay-management-system.onrender.com" style="flex:1; padding: 0.35rem 0.5rem; font-size: 0.8rem; border: 1px solid #cbd5e1; border-radius: 4px;">
+                    <button type="button" class="btn btn-primary" id="saveApiUrlBtn" style="padding: 0.35rem 0.75rem; font-size: 0.75rem;" onclick="saveCustomApiUrl()">Save</button>
+                </div>
+                <small style="color: #64748b; display:block; margin-top: 0.35rem;" id="currentApiUrlDisplay"></small>
+            </div>
         </div>
     </div>
 
@@ -7739,13 +7750,56 @@
                 startSession(account);
             } catch (error) {
                 console.error('Sign-in failed', error);
-                errorBox.textContent = error.message || 'Unable to sign in. Check your username and password, then try again.';
+                let safeMessage = error.message;
+                if (!safeMessage || safeMessage.includes('405') || safeMessage.includes('METHOD_NOT_ALLOWED')) {
+                    safeMessage = 'Unable to sign in right now. The authentication service is unavailable or running on a static host without an active BMS backend connection.';
+                } else if (error.code === 'NETWORK_ERROR' || error.status === 0) {
+                    safeMessage = 'Unable to connect to the BMS server. Please verify the server is running or check your network connection.';
+                } else if (error.status === 401) {
+                    safeMessage = 'Invalid username or password.';
+                }
+                errorBox.textContent = safeMessage;
                 errorBox.style.display = 'block';
             } finally {
                 submitButton.disabled = false;
                 submitButton.textContent = submitButton.dataset.originalText || '🔐 SIGN IN TO PORTAL';
             }
         };
+
+        function toggleApiSettings() {
+            const panel = $('apiConfigPanel');
+            if (!panel) return;
+            const isVisible = panel.style.display !== 'none';
+            panel.style.display = isVisible ? 'none' : 'block';
+            if (!isVisible) {
+                const current = window.BMSSQLite ? window.BMSSQLite.getBaseUrl() : '';
+                const input = $('customApiUrlInput');
+                if (input) input.value = current;
+                const display = $('currentApiUrlDisplay');
+                if (display) {
+                    display.textContent = 'Active: ' + (current || 'same-origin');
+                    display.style.color = '#64748b';
+                }
+            }
+        }
+
+        function saveCustomApiUrl() {
+            const input = $('customApiUrlInput');
+            const val = (input ? input.value : '').trim();
+            if (window.BMSSQLite) {
+                window.BMSSQLite.setBaseUrl(val);
+                const updated = window.BMSSQLite.getBaseUrl();
+                const display = $('currentApiUrlDisplay');
+                if (display) {
+                    display.textContent = 'Saved! Active: ' + (updated || 'same-origin');
+                    display.style.color = '#16a34a';
+                }
+                setTimeout(() => {
+                    const panel = $('apiConfigPanel');
+                    if (panel) panel.style.display = 'none';
+                }, 1200);
+            }
+        }
 
         $('registrationForm').onsubmit = async e => {
             e.preventDefault();

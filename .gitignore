@@ -1,13 +1,39 @@
 # =====================================================================
 # Git Ignore Configuration for Barangay Management System (BMS)
+# Defense-in-Depth Secret & Personal Data Protection
 # =====================================================================
 
-# Server-side secrets and local environment overrides
+# 1. Server-side secrets and local environment overrides
 .env
 .env.*
+.env.local
+.env.development
+.env.staging
+.env.production
 !.env.example
 
-# Local databases, journals, locks, and backups (Never commit production/test user data)
+# 2. Secret directories, credentials, tokens, and keystores
+secrets/
+credentials/
+*.credential*
+*service-account*.json
+*.pem
+*.key
+*.p12
+*.pfx
+*.pkcs12
+*.kdbx
+*.crt
+*.cert
+*.p8
+id_rsa
+id_rsa.pub
+id_ecdsa
+id_ecdsa.pub
+id_ed25519
+id_ed25519.pub
+
+# 3. Local databases, journals, locks, and backups (Never commit production/test user data)
 *.sqlite
 *.sqlite3
 *.sqlite3*
@@ -18,28 +44,55 @@
 bms.db
 bms.*.sqlite3
 
-# Runtime logs and server outputs
+# 4. Resident personal data exports and database dumps (Data Privacy Act of 2012)
+*resident*.csv
+*residents*.csv
+*voter*.csv
+*export*.csv
+*.dump
+*.sql
+*.bak
+*backup*
+*.tar.gz
+*.tar
+*.7z
+
+# 5. Runtime logs and server outputs
 *.log
 bms_server.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# Python bytecode and caches
+# 6. Python bytecode, caches, and virtual environments
 __pycache__/
 *.py[cod]
 *$py.class
 .pytest_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
 
-# IDE and editor settings
+# 7. Node / build artifacts (if npm/build tools are utilized)
+node_modules/
+dist/
+build/
+coverage/
+.nyc_output/
+
+# 8. IDE and editor settings
 .vscode/
 .idea/
 *.suo
 *.user
 
-# Operating system files
+# 9. Operating system files
 Thumbs.db
 Desktop.ini
 .DS_Store
 
-# User-uploaded files (keep folder structure via .gitkeep)
+# 10. User-uploaded files (keep folder structure via .gitkeep)
 uploads/residents/*
 !uploads/residents/.gitkeep
 uploads/branding/hero/*
@@ -51,7 +104,9 @@ uploads/officials/*
 uploads/protected/*
 !uploads/protected/.gitkeep
 
-# Temporary scratch and draft files
+# 11. Temporary scratch and draft files
 BMS_NEW*
 _inspect_db*
-
+scratch/
+tmp/
+temp/

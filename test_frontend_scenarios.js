@@ -183,6 +183,57 @@ async function runTests() {
         global.fetch = origFetch;
     }
 
+    // 4. API URL Resolution & 405 Method Not Allowed Handling
+    console.log("\n[Scenario 4] API URL Resolution & 405 Handling");
+    try {
+        // Test localStorage override
+        const storageMock = {};
+        global.window.localStorage = {
+            getItem: (k) => storageMock[k] || null,
+            setItem: (k, v) => { storageMock[k] = String(v); },
+            removeItem: (k) => { delete storageMock[k]; }
+        };
+
+        // Re-eval sqlite-api to test fresh state
+        eval(sqliteApiCode);
+        assert(window.BMSSQLite.getBaseUrl() === 'http://127.0.0.1:8000', "Default origin resolves to 8000");
+
+        // Simulate GitHub Pages hostname
+        global.window.location = {
+            protocol: 'https:',
+            hostname: 'bms6-oss.github.io',
+            origin: 'https://bms6-oss.github.io'
+        };
+        eval(sqliteApiCode);
+        assert(window.BMSSQLite.getBaseUrl() === 'https://barangay-management-system.onrender.com', "GitHub Pages automatically resolves to cloud API backend");
+
+        // Simulate localStorage custom URL
+        window.BMSSQLite.setBaseUrl('https://my-custom-bms.gov.ph');
+        assert(window.BMSSQLite.getBaseUrl() === 'https://my-custom-bms.gov.ph', "Custom base URL overrides static host");
+        assert(storageMock['bmsApiBaseUrl'] === 'https://my-custom-bms.gov.ph', "Custom base URL is persisted to localStorage");
+
+        // Test 405 Method Not Allowed handling
+        global.fetch = async () => ({
+            ok: false,
+            status: 405,
+            json: async () => ({})
+        });
+
+        try {
+            await window.BMSSQLite.login('test', 'test');
+            assert(false, "Login on 405 should throw");
+        } catch (err) {
+            assert(err.status === 405, "Error preserves status 405");
+            assert(err.code === 'METHOD_NOT_ALLOWED', "Error code is METHOD_NOT_ALLOWED");
+            assert(!err.message.includes('Request failed (405)'), "Error message does NOT leak raw 'Request failed (405)'");
+            assert(err.message.includes('backend server'), "Error message explains backend server connection");
+        }
+    } catch (e) {
+        assert(false, "Scenario 4 threw unexpectedly", e.message);
+    } finally {
+        global.fetch = origFetch;
+    }
+
     console.log(`\nSimulation Results: ${passed} passed, ${failed} failed`);
     if (failed > 0) {
         process.exitCode = 1;

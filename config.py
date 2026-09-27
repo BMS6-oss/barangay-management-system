@@ -36,7 +36,7 @@ PORT = int(os.getenv('PORT', os.getenv('BMS_PORT', '8000')))
 API_BASE_URL = os.getenv('API_BASE_URL', os.getenv('BMS_API_BASE_URL', '')).rstrip('/')
 _allowed_origins = os.getenv(
     'BMS_ALLOWED_ORIGINS',
-    f'http://127.0.0.1:{PORT},http://localhost:{PORT}',
+    f'http://127.0.0.1:{PORT},http://localhost:{PORT},https://bms6-oss.github.io',
 )
 _origins_list = [origin.strip().rstrip('/') for origin in _allowed_origins.split(',') if origin.strip()]
 if os.getenv('APP_URL'):
@@ -91,6 +91,7 @@ LOGIN_RATE_LIMIT = int(os.getenv('BMS_LOGIN_RATE_LIMIT', '10'))
 REGISTER_RATE_LIMIT = int(os.getenv('BMS_REGISTER_RATE_LIMIT', '5'))
 WRITE_RATE_LIMIT = int(os.getenv('BMS_WRITE_RATE_LIMIT', '120'))
 RATE_LIMIT_WINDOW_SECONDS = int(os.getenv('BMS_RATE_LIMIT_WINDOW_SECONDS', '60'))
+LOGIN_RATE_LIMIT_WINDOW_SECONDS = int(os.getenv('BMS_LOGIN_RATE_LIMIT_WINDOW_SECONDS', '60'))
 REQUIRE_HTTPS = os.getenv('BMS_REQUIRE_HTTPS', 'false').lower() in ('true', '1', 'yes')
 
 # Application base URL

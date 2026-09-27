@@ -1,0 +1,52 @@
+# =====================================================================
+# Pre-Commit Configuration for Barangay Management System (BMS)
+# Secret Detection & Security Scanning Gate
+# =====================================================================
+# Install hooks: pre-commit install && pre-commit install --hook-type pre-push
+# Run manually:  pre-commit run --all-files
+
+repos:
+  # detect-secrets: Yelp's high-signal secret scanner
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+    hooks:
+      - id: detect-secrets
+        args: ['--baseline', '.secrets.baseline']
+        exclude: package-lock\.json|\.secrets\.baseline
+
+  # Standard pre-commit checks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-added-large-files
+        args: ['--maxkb=1024']
+      - id: check-case-conflict
+      - id: check-merge-conflict
+      - id: detect-private-key
+
+  # Local hooks for BMS-specific secret scanning
+  - repo: local
+    hooks:
+      - id: bms-secret-scan
+        name: BMS Secret & Credential Scanner
+        entry: python scripts/security/scan_secrets.py --staged
+        language: python
+        stages: [pre-commit]
+        pass_filenames: false
+        always_run: true
+
+      - id: bms-env-file-guard
+        name: Block .env files from commit
+        entry: python scripts/security/scan_secrets.py --env-guard
+        language: python
+        stages: [pre-commit]
+        pass_filenames: false
+        always_run: true
+
+      - id: bms-pre-push-scan
+        name: BMS Pre-Push Secret Scan
+        entry: python scripts/security/scan_secrets.py --pre-push
+        language: python
+        stages: [pre-push]
+        pass_filenames: false
+        always_run: true
