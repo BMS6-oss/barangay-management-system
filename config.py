@@ -44,9 +44,9 @@ if os.getenv('APP_URL'):
 ALLOWED_ORIGINS = frozenset(_origins_list)
 
 # Database configuration
-# The existing BMS uses SQLite. On Render, mount a Persistent Disk at /data
-# and set BMS_DATABASE_PATH=/data/bms.sqlite3.
-# DATABASE_URL is reserved for external database connection strings.
+# Production (Render/Docker): PostgreSQL via DATABASE_URL (managed database).
+# Local development: SQLite via BMS_DATABASE_PATH (defaults to bms.sqlite3).
+# When DATABASE_URL is set, db_adapter uses PostgreSQL and ignores the SQLite path.
 DATABASE_URL = os.getenv('DATABASE_URL', '')
 _db_env = os.getenv('BMS_DATABASE_PATH', os.getenv('DATABASE_PATH', ''))
 if _db_env:
@@ -58,6 +58,12 @@ try:
     DATABASE_PATH.parent.mkdir(parents=True, exist_ok=True)
 except Exception:
     pass
+
+# Initial administrator account password used to seed a fresh production
+# database (PostgreSQL) or a fresh local SQLite database. In production this
+# MUST be supplied via environment / Render secret (BMS_ADMIN_PASSWORD) and is
+# never committed to source control. The default only applies to local dev.
+ADMIN_PASSWORD = os.getenv('BMS_ADMIN_PASSWORD', 'admin123')
 
 # Uploads directory configuration (supports persistent disk mount in Docker/Render)
 _uploads_env = os.getenv('BMS_UPLOADS_PATH', os.getenv('UPLOADS_PATH', ''))

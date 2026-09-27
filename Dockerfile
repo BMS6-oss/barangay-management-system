@@ -22,11 +22,12 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application files
-COPY --chown=bmsuser:bmsuser server.py config.py index.html sqlite-api.js logo.png compressed_b2f0e3ddc22210e534db1aade7c52180.png ./
+COPY --chown=bmsuser:bmsuser server.py config.py db_adapter.py index.html sqlite-api.js logo.png compressed_b2f0e3ddc22210e534db1aade7c52180.png ./
 COPY --chown=bmsuser:bmsuser assets/ ./assets/
 COPY --chown=bmsuser:bmsuser css/ ./css/
 COPY --chown=bmsuser:bmsuser js/ ./js/
 COPY --chown=bmsuser:bmsuser data/ ./data/
+COPY --chown=bmsuser:bmsuser scripts/ ./scripts/
 COPY --chown=bmsuser:bmsuser uploads/ ./uploads/
 
 # Mount point for persistent database disk

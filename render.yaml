@@ -1,5 +1,14 @@
 # Render Blueprint Specification for Barangay Management System (BMS)
+# Production Architecture: Browser -> Render -> Docker Container -> BMS Backend -> DATABASE_URL -> Managed PostgreSQL
 # https://render.com/docs/blueprint-spec
+
+databases:
+  - name: bms-postgres
+    databaseName: bms
+    user: bmsuser
+    plan: starter
+    region: oregon
+
 services:
   - type: web
     name: barangay-management-system
@@ -18,10 +27,14 @@ services:
         value: "false"
       - key: BMS_REQUIRE_HTTPS
         value: "true"
-      - key: BMS_DATABASE_PATH
-        value: /data/bms.sqlite3
+      - key: DATABASE_URL
+        fromDatabase:
+          name: bms-postgres
+          property: connectionString
       - key: BMS_UPLOADS_PATH
         value: /data/uploads
+      - key: BMS_ADMIN_PASSWORD
+        generateValue: true
       - key: APP_URL
         sync: false
       - key: BMS_ALLOWED_ORIGINS
@@ -33,6 +46,6 @@ services:
       - key: GOOGLE_REDIRECT_URI
         sync: false
     disk:
-      name: bms-data
+      name: bms-uploads
       mountPath: /data
       sizeGB: 1

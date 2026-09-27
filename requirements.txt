@@ -5,6 +5,10 @@
 # - No external pip packages required for basic runtime or SQLite API operations.
 # - Optional: python-dotenv (pure Python parser is built-in to config.py)
 #
+# Production Database Engine:
+psycopg2-binary>=2.9.9
+
 # Optional enhancement libraries:
 # - Pillow >= 10.0.0 (enables server-side image watermarking on uploaded photos; falls back to CSS watermark if absent)
 Pillow>=10.0.0
+

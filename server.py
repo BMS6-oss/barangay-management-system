@@ -26,6 +26,7 @@ from urllib.parse import parse_qs, urlencode, urlparse
 from urllib.request import Request, urlopen
 
 import config
+import db_adapter
 
 # Optional: Pillow for server-side image watermarking.
 # Falls back gracefully if not installed (CSS overlay used instead).
@@ -422,6 +423,16 @@ def email_is_valid(value):
 
 
 def db():
+    """Return a connection to the active database engine.
+
+    Production (Render/Docker) is backed by PostgreSQL when ``DATABASE_URL`` is
+    set; local development falls back to the SQLite file at ``DB_PATH``. The
+    connection exposes the same row/cursor interface regardless of engine, so
+    every route (login, dashboard, etc.) queries the configured production
+    database transparently.
+    """
+    if db_adapter.is_postgres():
+        return db_adapter.get_postgres_connection()
     connection = sqlite3.connect(DB_PATH)
     connection.row_factory = sqlite3.Row
     connection.execute('PRAGMA foreign_keys = ON')
@@ -513,6 +524,9 @@ def check_and_update_overdue_tasks(connection):
             pass
 
 def init_db():
+    if db_adapter.is_postgres():
+        db_adapter.init_db()
+        return
     with db() as connection:
         connection.executescript(SCHEMA)
         # Column migrations for databases created by older versions.
