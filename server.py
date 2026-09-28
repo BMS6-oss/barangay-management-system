@@ -1689,7 +1689,7 @@ class Handler(BaseHTTPRequestHandler):
                 return
             with db() as connection:
                 rows = connection.execute('''
-                    SELECT u.name AS staff_name,
+                    SELECT u.name AS staff_name, u.role,
                         SUM(CASE WHEN l.event_type = 'cert:issued' THEN 1 ELSE 0 END) AS certs_issued,
                         SUM(CASE WHEN l.event_type = 'request:status-updated' THEN 1 ELSE 0 END) AS requests_processed,
                         SUM(CASE WHEN l.event_type = 'resident:added' THEN 1 ELSE 0 END) AS residents_registered,

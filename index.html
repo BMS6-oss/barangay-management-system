@@ -74,9 +74,9 @@
         }
 
         .container {
-            max-width: 1400px;
+            max-width: 1600px;
             margin: 0 auto;
-            padding: 0 1rem;
+            padding: 0 1.25rem;
         }
 
         /* ========== LOGIN PAGE ========== */
@@ -104,7 +104,7 @@
             box-shadow: 0 24px 64px rgba(36, 51, 34, 0.35);
             width: 100%;
             max-width: 460px;
-            padding: 2.5rem;
+            padding: 3rem;
             position: relative;
             z-index: 1;
             border-top: 4px solid var(--bms-green);
@@ -249,10 +249,11 @@
         header {
             background: var(--bms-card);
             color: var(--bms-text);
-            padding: 0.75rem 0;
+            padding: 0.9rem 0;
             display: none;
-            box-shadow: 0 1px 0 var(--bms-border), 0 2px 12px rgba(36, 51, 34, 0.08);
+            box-shadow: 0 2px 12px rgba(36, 51, 34, 0.07);
             border-bottom: 3px solid var(--bms-green);
+            backdrop-filter: blur(4px);
         }
 
         .header-wrap {
@@ -260,7 +261,7 @@
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 1rem;
+            gap: 1.25rem;
         }
 
         .brand {
@@ -291,7 +292,7 @@
         }
 
         .brand h1 {
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             font-weight: 800;
             letter-spacing: 0.3px;
             color: var(--bms-forest);
@@ -305,7 +306,7 @@
         .header-right {
             display: flex;
             align-items: center;
-            gap: 0.85rem;
+            gap: 1rem;
         }
 
         .notif-bell {
@@ -480,9 +481,15 @@
 
         .page-layout {
             display: grid;
-            grid-template-columns: 250px 1fr;
-            gap: 1.5rem;
+            grid-template-columns: 260px 1fr;
+            gap: 1.75rem;
             margin: 1.5rem 0;
+        }
+
+        @media (max-width: 1024px) {
+            .page-layout {
+                grid-template-columns: 1fr;
+            }
         }
 
         @media (max-width: 992px) {
@@ -495,7 +502,7 @@
         .sidebar {
             background: var(--bms-forest);
             border-radius: 12px;
-            padding: 1rem;
+            padding: 1.25rem;
             box-shadow: 0 4px 16px rgba(36, 51, 34, 0.18);
             height: fit-content;
             position: sticky;
@@ -509,7 +516,7 @@
             text-transform: uppercase;
             padding: 0.5rem 0.75rem;
             border-bottom: 1px solid rgba(215, 221, 177, 0.3);
-            margin-bottom: 0.75rem;
+            margin-bottom: 1rem;
             letter-spacing: 1px;
             font-weight: 700;
         }
@@ -527,18 +534,18 @@
         }
 
         .sidebar li {
-            margin: 0.2rem 0;
+            margin: 0.15rem 0;
         }
 
         .sidebar a {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0.6rem 0.85rem;
+            padding: 0.7rem 0.9rem;
             text-decoration: none;
             color: #C8D8B8;
             border-radius: 7px;
-            font-size: 0.86rem;
+            font-size: 0.88rem;
             font-weight: 500;
             transition: all 0.15s ease;
         }
@@ -577,17 +584,120 @@
         .main-content {
             background: var(--bms-card);
             border-radius: 12px;
-            padding: 1.75rem;
+            padding: 2rem;
             box-shadow: 0 2px 12px rgba(36, 51, 34, 0.07);
             min-height: 550px;
             border: 1px solid var(--bms-border);
         }
 
+        /* ========== DASHBOARD ENHANCEMENTS ========== */
+        .dashboard-section {
+            margin: 1.75rem 0;
+        }
+
+        .dashboard-section-title {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--bms-forest);
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            margin-bottom: 1rem;
+            padding-bottom: 0.4rem;
+            border-bottom: 2px solid var(--bms-sage);
+        }
+
+        .dashboard-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .data-tiles {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+        }
+
+        .data-tiles .data-tiles-item {
+            background: var(--bms-bg);
+            border: 1px solid var(--bms-border);
+            border-radius: 6px;
+            padding: 0.5rem 0.8rem;
+            font-size: 0.82rem;
+            color: var(--bms-text-2);
+        }
+
+        .data-tiles .data-tiles-item strong {
+            color: var(--bms-text);
+        }
+
+        .stat-card .stat-icon {
+            font-size: 1.6rem;
+            opacity: 0.7;
+            margin-bottom: 0.4rem;
+        }
+
+        .stat-card.purple .stat-icon { opacity: 0.8; }
+        .stat-card.green .stat-icon { opacity: 0.8; }
+        .stat-card.gold .stat-icon { opacity: 0.8; }
+        .stat-card.red .stat-icon { opacity: 0.8; }
+
+        .loading-spinner {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            color: var(--bms-muted);
+            font-size: 0.88rem;
+        }
+
+        .loading-spinner::after {
+            content: '';
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--bms-border);
+            border-top-color: var(--bms-forest);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error-banner {
+            background: #FDEEEE;
+            border-left: 4px solid var(--danger);
+            color: #782018;
+            padding: 0.8rem 1.2rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .error-banner button {
+            margin-left: auto;
+            background: var(--danger);
+            color: white;
+        }
+
         .page-title {
             color: var(--bms-forest);
             border-bottom: 3px solid var(--bms-green);
-            padding-bottom: 0.65rem;
-            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            margin-bottom: 1.75rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -596,7 +706,7 @@
         }
 
         .page-title h2 {
-            font-size: 1.25rem;
+            font-size: 1.35rem;
             display: flex;
             align-items: center;
             gap: 0.5rem;
@@ -627,18 +737,20 @@
         /* ========== STATS CARDS GRID ========== */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-            gap: 1rem;
-            margin: 1.5rem 0;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.25rem;
+            margin: 1.75rem 0;
         }
 
         .stat-card {
             background: linear-gradient(135deg, var(--bms-forest), var(--forest-light));
             color: white;
-            padding: 1.25rem 1.25rem 1rem;
+            padding: 1.5rem 1.5rem 1.2rem;
             border-radius: 10px;
             transition: transform 0.2s, box-shadow 0.2s;
             box-shadow: 0 3px 10px rgba(80, 114, 53, 0.2);
+            display: flex;
+            flex-direction: column;
         }
 
         .stat-card:hover {
@@ -664,14 +776,16 @@
         }
 
         .stat-card h4 {
-            font-size: 0.73rem;
+            font-size: 0.78rem;
             opacity: 0.85;
             text-transform: uppercase;
             letter-spacing: 0.6px;
+            margin-bottom: 0.4rem;
+            font-weight: 600;
         }
 
         .stat-card .num {
-            font-size: 2.2rem;
+            font-size: 2.5rem;
             font-weight: 800;
             margin: 0.2rem 0;
             line-height: 1.1;
@@ -759,8 +873,9 @@
         .empty-state {
             color: var(--bms-muted);
             text-align: center;
-            padding: 2rem;
+            padding: 2.5rem 1.5rem;
             font-style: italic;
+            font-size: 0.9rem;
         }
 
         /* ========== BUTTONS ========== */
@@ -850,16 +965,18 @@
         .panel {
             border: 1px solid var(--bms-border);
             border-radius: 10px;
-            margin: 1rem 0;
+            margin: 1.25rem 0;
             overflow: hidden;
+            box-shadow: 0 1px 4px rgba(36, 51, 34, 0.04);
+            background: var(--bms-card);
         }
 
         .panel-head {
             background: var(--bms-forest);
             color: white;
-            padding: 0.75rem 1rem;
+            padding: 0.85rem 1.25rem;
             font-weight: 600;
-            font-size: 0.88rem;
+            font-size: 0.9rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -879,7 +996,7 @@
         }
 
         .panel-body {
-            padding: 1rem;
+            padding: 1.25rem;
             background: var(--bms-card);
         }
 
@@ -1518,6 +1635,33 @@
         }
 
         /* ========== RESPONSIVE ========== */
+        @media (max-width: 1024px) {
+            .page-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                position: static;
+            }
+
+            .brand h1 {
+                font-size: 1rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .event-row {
+                grid-template-columns: 1fr;
+            }
+
+            .cert-signatures {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+        }
+
         @media (max-width: 768px) {
             .page-layout {
                 grid-template-columns: 1fr;
@@ -1532,7 +1676,7 @@
             }
 
             .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: 1fr;
             }
 
             .event-row {
@@ -1555,7 +1699,7 @@
             }
 
             .login-card {
-                padding: 1.75rem 1.25rem;
+                padding: 2rem 1.5rem;
             }
 
             .main-content {
@@ -3289,40 +3433,48 @@
 
                         <div class="stats-grid">
                             <div class="stat-card">
+                                <span class="stat-icon">👥</span>
                                 <h4>Total Residents</h4>
                                 <div class="num" data-stat="residents">0</div>
                             </div>
                             <div class="stat-card green">
+                                <span class="stat-icon">🏠</span>
                                 <h4>Households</h4>
                                 <div class="num" data-stat="households">0</div>
                             </div>
                             <div class="stat-card purple">
+                                <span class="stat-icon">👤</span>
                                 <h4>Registered Users</h4>
                                 <div class="num" data-stat="users">0</div>
                             </div>
                             <div class="stat-card gold">
+                                <span class="stat-icon">📄</span>
                                 <h4>Certificates Issued</h4>
                                 <div class="num" data-stat="issued">0</div>
                             </div>
                             <div class="stat-card red">
+                                <span class="stat-icon">⏳</span>
                                 <h4>Pending Requests</h4>
                                 <div class="num" data-stat="pending">0</div>
                             </div>
                             <div class="stat-card green">
+                                <span class="stat-icon">📅</span>
                                 <h4>Upcoming Programs</h4>
                                 <div class="num" data-stat="programs">0</div>
                             </div>
                             <div class="stat-card gold">
+                                <span class="stat-icon">📋</span>
                                 <h4>Total Requests</h4>
                                 <div class="num" data-stat="requests">0</div>
                             </div>
                             <div class="stat-card green">
+                                <span class="stat-icon">📢</span>
                                 <h4>Active Announcements</h4>
                                 <div class="num" data-stat="announcements">0</div>
                             </div>
                         </div>
 
-                        <div class="form-row">
+                        <div class="dashboard-row">
                             <div class="panel">
                                 <div class="panel-head">🏆 OFFICIAL ACTIVITY SUMMARY (FROM AUDIT LOG)</div>
                                 <div class="panel-body table-responsive">
@@ -3347,6 +3499,37 @@
                             <div class="panel">
                                 <div class="panel-head gold">🕘 RECENT SYSTEM ACTIVITY</div>
                                 <div class="panel-body" id="recentActivityList">
+                                    <div class="empty-state">Loading…</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="dashboard-row">
+                            <div class="panel">
+                                <div class="panel-head green">👥 RECENT RESIDENT REGISTRATIONS</div>
+                                <div class="panel-body">
+                                    <div class="table-responsive">
+                                        <table class="data-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Resident ID</th>
+                                                    <th>Full Name</th>
+                                                    <th>Classification</th>
+                                                    <th>Age/Sex</th>
+                                                    <th>Address</th>
+                                                    <th>Registered</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="adminRecentResidentsBody">
+                                                <tr><td colspan="6" class="empty-state">Loading…</td></tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="panel">
+                                <div class="panel-head">📋 PENDING REQUESTS</div>
+                                <div class="panel-body" id="adminPendingRequestsList">
                                     <div class="empty-state">Loading…</div>
                                 </div>
                             </div>
@@ -4585,40 +4768,55 @@
                         <!-- KPI Grid -->
                         <div class="stats-grid">
                             <div class="stat-card">
+                                <span class="stat-icon">👨‍💼</span>
                                 <h4>Total Staff</h4>
                                 <div class="num" id="pbTotalStaff">0</div>
                             </div>
                             <div class="stat-card green">
+                                <span class="stat-icon">✅</span>
                                 <h4>Available Staff</h4>
                                 <div class="num" id="pbAvailableStaff">0</div>
                             </div>
                             <div class="stat-card">
+                                <span class="stat-icon">📋</span>
                                 <h4>Assigned Tasks</h4>
                                 <div class="num" id="pbAssignedTasks">0</div>
                             </div>
                             <div class="stat-card gold">
+                                <span class="stat-icon">⏳</span>
                                 <h4>Pending Tasks</h4>
                                 <div class="num" id="pbPendingTasks">0</div>
                             </div>
                             <div class="stat-card purple">
+                                <span class="stat-icon">🏃</span>
                                 <h4>In Progress</h4>
                                 <div class="num" id="pbInProgressTasks">0</div>
                             </div>
                             <div class="stat-card green">
+                                <span class="stat-icon">✅</span>
                                 <h4>Completed Tasks</h4>
                                 <div class="num" id="pbCompletedTasks">0</div>
                             </div>
                             <div class="stat-card red">
+                                <span class="stat-icon">⚠️</span>
                                 <h4>Overdue Tasks</h4>
                                 <div class="num" id="pbOverdueTasks">0</div>
                             </div>
                         </div>
 
                         <!-- Recent Staff Activity Live Stream -->
-                        <div class="panel" style="margin-top:1.5rem;">
-                            <div class="panel-head">📡 RECENT STAFF OPERATIONAL ACTIVITY</div>
-                            <div class="panel-body" id="pbRecentActivityList">
-                                <div class="empty-state">Loading activity feed…</div>
+                        <div class="dashboard-row">
+                            <div class="panel">
+                                <div class="panel-head">📡 RECENT STAFF OPERATIONAL ACTIVITY</div>
+                                <div class="panel-body" id="pbRecentActivityList">
+                                    <div class="empty-state">Loading activity feed…</div>
+                                </div>
+                            </div>
+                            <div class="panel">
+                                <div class="panel-head gold">📊 TASK STATUS OVERVIEW</div>
+                                <div class="panel-body" id="pbTaskStatusSummary">
+                                    <div class="empty-state">Loading task overview…</div>
+                                </div>
                             </div>
                         </div>
                     </section>
@@ -4692,26 +4890,38 @@
                         </div>
                         <div class="stats-grid">
                             <div class="stat-card purple">
+                                <span class="stat-icon">📋</span>
                                 <h4>My Open Tasks</h4>
                                 <div class="num" data-stat="myTasks">0</div>
                             </div>
                             <div class="stat-card">
+                                <span class="stat-icon">📄</span>
                                 <h4>Certificates I Issued</h4>
                                 <div class="num" data-stat="myCerts">0</div>
                             </div>
                             <div class="stat-card green">
+                                <span class="stat-icon">📥</span>
                                 <h4>Requests I Processed Today</h4>
                                 <div class="num" data-stat="myProcessed">0</div>
                             </div>
                             <div class="stat-card red">
+                                <span class="stat-icon">⚠️</span>
                                 <h4>My Urgent Tasks</h4>
                                 <div class="num" data-stat="myUrgent">0</div>
                             </div>
                         </div>
-                        <div class="panel">
-                            <div class="panel-head staff">⚡ MY TASK QUEUE</div>
-                            <div class="panel-body" id="staffTaskList">
-                                <div class="empty-state">Loading…</div>
+                        <div class="dashboard-row">
+                            <div class="panel">
+                                <div class="panel-head staff">⚡ MY TASK QUEUE</div>
+                                <div class="panel-body" id="staffTaskList">
+                                    <div class="empty-state">Loading…</div>
+                                </div>
+                            </div>
+                            <div class="panel">
+                                <div class="panel-head green">📋 PENDING REQUESTS FOR PROCESSING</div>
+                                <div class="panel-body" id="staffPendingRequestsList">
+                                    <div class="empty-state">Loading…</div>
+                                </div>
                             </div>
                         </div>
                     </section>
@@ -4978,14 +5188,17 @@
                         </div>
                         <div class="stats-grid">
                             <div class="stat-card">
+                                <span class="stat-icon">⏳</span>
                                 <h4>My Pending Requests</h4>
                                 <div class="num" data-stat="myPending">0</div>
                             </div>
                             <div class="stat-card green">
+                                <span class="stat-icon">✅</span>
                                 <h4>My Approved Requests</h4>
                                 <div class="num" data-stat="myApproved">0</div>
                             </div>
                             <div class="stat-card gold">
+                                <span class="stat-icon">📋</span>
                                 <h4>My Total Submissions</h4>
                                 <div class="num" data-stat="myTotal">0</div>
                             </div>
@@ -4993,22 +5206,23 @@
                         <div class="panel">
                             <div class="panel-head green">⚡ QUICK ACTIONS</div>
                             <div class="panel-body" style="display:flex; gap:1rem; flex-wrap:wrap;">
-                                <button class="btn btn-secondary" onclick="showView('resident-request-cert')">📄 Request
-                                    Certificate</button>
-                                <button class="btn btn-primary" onclick="showView('resident-track')">🔍 Track My
-                                    Requests</button>
+                                <button class="btn btn-secondary" onclick="showView('resident-request-cert')">📄 Request Certificate</button>
+                                <button class="btn btn-primary" onclick="showView('resident-request-service')">🛎️ Request Service</button>
+                                <button class="btn btn-secondary" onclick="showView('resident-track')">🔍 Track My Requests</button>
                             </div>
                         </div>
-                        <div class="panel">
-                            <div class="panel-head green">📅 UPCOMING BARANGAY PROGRAMS</div>
-                            <div class="panel-body" id="residentProgramsPreview">
-                                <div class="empty-state">Loading…</div>
+                        <div class="dashboard-row">
+                            <div class="panel">
+                                <div class="panel-head green">📅 UPCOMING BARANGAY PROGRAMS</div>
+                                <div class="panel-body" id="residentProgramsPreview">
+                                    <div class="empty-state">Loading…</div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="panel">
-                            <div class="panel-head">📢 LATEST ANNOUNCEMENTS</div>
-                            <div class="panel-body" id="residentAnnouncementsPreview">
-                                <div class="empty-state">Loading…</div>
+                            <div class="panel">
+                                <div class="panel-head">📢 LATEST ANNOUNCEMENTS</div>
+                                <div class="panel-body" id="residentAnnouncementsPreview">
+                                    <div class="empty-state">Loading…</div>
+                                </div>
                             </div>
                         </div>
                     </section>
@@ -5367,7 +5581,10 @@
                     const node = document.querySelector(`[data-stat="${key}"]`);
                     if (node) node.textContent = Number(value).toLocaleString('en-US');
                 });
-            } catch (error) { console.error(error); }
+            } catch (error) {
+                console.error(error);
+                showDashboardError('dashboard-summary', error);
+            }
             try {
                 const rows = await api.performance();
                 const body = $('performanceBody');
@@ -5379,7 +5596,7 @@
                         .forEach(v => tr.appendChild(el('td', null, String(v))));
                     body.appendChild(tr);
                 });
-            } catch (error) { console.error(error); }
+            } catch (error) { console.error(error); showDashboardError('performanceBody', error); }
             try {
                 const items = await api.recentActivity();
                 const list = $('recentActivityList');
@@ -5393,7 +5610,59 @@
                     wrap.appendChild(left);
                     list.appendChild(wrap);
                 });
-            } catch (error) { console.error(error); }
+            } catch (error) { console.error(error); showDashboardError('recentActivityList', error); }
+            try {
+                const residents = await api.list('residents');
+                const body = $('adminRecentResidentsBody');
+                body.innerHTML = '';
+                if (!residents.length) { body.appendChild(emptyRow(6, 'No residents registered yet.')); return; }
+                const recent = residents.slice(-6).reverse();
+                recent.forEach(r => {
+                    const tr = document.createElement('tr');
+                    tr.appendChild(el('td', null, r.resident_id || '—'));
+                    tr.appendChild(el('td', null, fullName(r)));
+                    tr.appendChild(el('td', null, r.classification || 'Unclassified'));
+                    tr.appendChild(el('td', null, `${calcAge(r.birth_date) || '—'} / ${r.gender || '—'}`));
+                    tr.appendChild(el('td', null, r.address || '—'));
+                    tr.appendChild(el('td', null, fmtDate(r.created_at)));
+                    body.appendChild(tr);
+                });
+            } catch (error) { console.error(error); showDashboardError('adminRecentResidentsBody', error); }
+            try {
+                const requests = await api.list('requests');
+                const list = $('adminPendingRequestsList');
+                list.innerHTML = '';
+                const pending = requestsCache.length ? requestsCache.filter(r => PENDING_STATUSES.map(s => s.toLowerCase()).includes(r.status?.toLowerCase())) : requests.filter(r => PENDING_STATUSES.map(s => s.toLowerCase()).includes(r.status?.toLowerCase()));
+                requestsCache = requests;
+                if (!pending.length) { list.appendChild(el('div', 'empty-state', 'No pending requests at this time.')); return; }
+                pending.slice(0, 5).forEach(r => {
+                    const item = el('div', 'task-item');
+                    const left = el('div');
+                    left.appendChild(el('strong', null, `[${r.request_id}] ${r.type || 'Request'}`));
+                    left.appendChild(el('div', 'task-meta', `${r.owner_name || r.payload_resident || '—'} · ${fmtDate(r.created_at)}`));
+                    item.appendChild(left);
+                    item.appendChild(el('span', `status ${r.status.includes('approv') ? 'approved' : 'pending'}`, r.status.toUpperCase()));
+                    list.appendChild(item);
+                });
+            } catch (error) { console.error(error); showDashboardError('adminPendingRequestsList', error); }
+        }
+
+        function showDashboardError(elementId, error) {
+            const node = document.getElementById(elementId);
+            if (!node) return;
+            node.innerHTML = '';
+            const banner = el('div', 'error-banner', `${error.message || 'Unable to load data.'}`);
+            const retryBtn = el('button', 'btn btn-sm btn-secondary', '↻ Retry');
+            retryBtn.onclick = () => {
+                if (elementId === 'performanceBody') api.performance();
+                if (elementId === 'recentActivityList') api.recentActivity();
+                if (elementId === 'adminRecentResidentsBody') api.list('residents');
+                if (elementId === 'adminPendingRequestsList') api.list('requests');
+                if (elementId === 'staffPendingRequestsList') api.list('requests');
+                if (elementId === 'staffTaskList') loadTasks();
+            };
+            banner.appendChild(retryBtn);
+            node.appendChild(banner);
         }
 
         async function refreshStaffDashboard() {
@@ -5405,6 +5674,22 @@
                 });
             } catch (error) { console.error(error); }
             await loadTasks();
+            try {
+                const requests = await api.list('requests');
+                const list = $('staffPendingRequestsList');
+                list.innerHTML = '';
+                const pending = requests.filter(r => PENDING_STATUSES.map(s => s.toLowerCase()).includes(r.status?.toLowerCase()));
+                if (!pending.length) { list.appendChild(el('div', 'empty-state', 'No pending requests to process.')); return; }
+                pending.slice(0, 5).forEach(r => {
+                    const item = el('div', 'task-item');
+                    const left = el('div');
+                    left.appendChild(el('strong', null, `[${r.request_id}] ${r.type || 'Request'}`));
+                    left.appendChild(el('div', 'task-meta', `${r.owner_name || r.payload_resident || '—'} · ${fmtDate(r.created_at)}`));
+                    item.appendChild(left);
+                    item.appendChild(el('span', 'status pending', r.status.replace(/-/g, ' ').toUpperCase()));
+                    list.appendChild(item);
+                });
+            } catch (error) { console.error(error); showDashboardError('staffPendingRequestsList', error); }
         }
 
         async function refreshResidentDashboard() {
@@ -6241,6 +6526,42 @@
             } catch (err) {
                 console.error('Failed to load PB Dashboard:', err);
             }
+            try {
+                await loadPbTasks();
+                renderPbTaskStatusSummary();
+            } catch (err) {
+                console.error('Failed to load task status summary:', err);
+            }
+        }
+
+        function renderPbTaskStatusSummary() {
+            const host = $('pbTaskStatusSummary');
+            if (!host) return;
+            host.innerHTML = '';
+            if (!pbTasksCache || !pbTasksCache.length) {
+                host.appendChild(el('div', 'empty-state', 'No tasks assigned yet.'));
+                return;
+            }
+            const statusCounts = {};
+            pbTasksCache.forEach(t => {
+                const s = (t.status || 'assigned').toUpperCase();
+                statusCounts[s] = (statusCounts[s] || 0) + 1;
+            });
+            const rows = [
+                ['Total Tasks', pbTasksCache.length, ''],
+                ['Assigned / Pending', (statusCounts.ASSIGNED || 0) + (statusCounts.PENDING || 0), 'PENDING'],
+                ['In Progress', statusCounts.IN_PROGRESS || statusCounts.ACKNOWLEDGED || 0, 'IN_PROGRESS'],
+                ['Completed', statusCounts.COMPLETED || statusCounts.DONE || 0, 'COMPLETED'],
+                ['Overdue', statusCounts.OVERDUE || 0, 'OVERDUE']
+            ];
+            rows.forEach(([label, count, statusClass]) => {
+                const row = el('div', 'task-item');
+                const left = el('div');
+                left.appendChild(el('strong', null, label));
+                row.appendChild(left);
+                row.appendChild(el('span', `status-badge ${statusClass}`, String(count)));
+                host.appendChild(row);
+            });
         }
 
         async function loadPbStaff() {
