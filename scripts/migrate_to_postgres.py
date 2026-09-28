@@ -113,6 +113,9 @@ def migrate(sqlite_path: str, dry_run: bool = False):
                 inserted += 1
             except Exception as e:
                 logger.warning(f"  Failed to insert into {table} (skipping row): {e}")
+                # Recover from PostgreSQL's aborted-transaction state so that
+                # subsequent rows can still be inserted.
+                pg_conn.raw_conn.rollback()
 
         pg_conn.commit()
         cur.close()

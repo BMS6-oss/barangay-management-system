@@ -34,6 +34,29 @@ class TestDbAdapter(unittest.TestCase):
         self.assertIn("'%?%'", t)
         self.assertTrue(t.endswith("title = %s"))
 
+    def test_is_not_translation(self):
+        q = "SELECT * FROM users WHERE ? IS NOT handler_user_id"
+        t = db_adapter.translate_query_to_postgres(q)
+        self.assertIn("IS DISTINCT FROM handler_user_id", t)
+        self.assertNotIn("IS NOT handler_user_id", t)
+
+    def test_is_not_null_preserved(self):
+        q = "SELECT * FROM users WHERE deleted_at IS NOT NULL"
+        t = db_adapter.translate_query_to_postgres(q)
+        self.assertIn("IS NOT NULL", t)
+        self.assertNotIn("IS DISTINCT FROM NULL", t)
+
+    def test_cursor_iterable(self):
+        cur = db_adapter.PostgresCursorWrapper.__new__(db_adapter.PostgresCursorWrapper)
+        cur._results = [
+            db_adapter.RowWrapper({'id': 1, 'name': 'a'}, (1, 'a'), ['id', 'name']),
+            db_adapter.RowWrapper({'id': 2, 'name': 'b'}, (2, 'b'), ['id', 'name']),
+        ]
+        cur._index = 0
+        names = [row['name'] for row in cur]
+        self.assertEqual(names, ['a', 'b'])
+
+
     def test_row_wrapper(self):
         r = db_adapter.RowWrapper({'id': 1, 'username': 'admin'}, (1, 'admin'), ['id', 'username'])
         self.assertEqual(r['id'], 1)

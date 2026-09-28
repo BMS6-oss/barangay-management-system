@@ -95,6 +95,7 @@ CREATE TABLE IF NOT EXISTS residents (
     classification TEXT NOT NULL DEFAULT 'Unclassified',
     owner_user_id INTEGER REFERENCES users(id),
     archived_at TEXT,
+    profile_image TEXT,
     resident_status TEXT NOT NULL DEFAULT 'ACTIVE' CHECK(resident_status IN ('PENDING', 'ACTIVE', 'SUSPENDED', 'ARCHIVED')),
     created_at TEXT NOT NULL,
     updated_at TEXT NOT NULL
@@ -375,6 +376,15 @@ def translate_query_to_postgres(sql: str) -> str:
         if 'ON CONFLICT' not in clean.upper():
             clean += ' ON CONFLICT DO NOTHING'
 
+    # Translate SQLite NULL-aware "IS NOT <col>" to PostgreSQL "IS DISTINCT FROM <col>".
+    # Leaves standard SQL forms ("IS NOT NULL", "IS NOT TRUE", etc.) untouched.
+    clean = re.sub(
+        r'\bIS NOT\s+(?!(?:NULL|TRUE|FALSE|DISTINCT|UNKNOWN)\b)([A-Za-z_][A-Za-z0-9_]*)',
+        r'IS DISTINCT FROM \1',
+        clean,
+        flags=re.IGNORECASE,
+    )
+
     # Convert SQLite '?' parameter placeholders to PostgreSQL '%s'
     # Split by single-quoted string literals to preserve any literal '?' inside strings
     parts = clean.split("'")
@@ -514,6 +524,13 @@ class PostgresCursorWrapper:
         rows = self._results[self._index:]
         self._index = len(self._results)
         return rows
+
+    def __iter__(self):
+        while True:
+            row = self.fetchone()
+            if row is None:
+                break
+            yield row
 
     def close(self):
         self.cursor.close()
