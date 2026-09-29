@@ -49,14 +49,14 @@ window.BMSSQLite = (() => {
                 // Static host detection (e.g., GitHub Pages, raw git CDN):
                 if (hostname.endsWith('github.io') || hostname === 'raw.githubusercontent.com') {
                     const cloudUrl = (window.__BMS_CONFIG__ && window.__BMS_CONFIG__.CLOUD_API_URL)
-                        || 'https://barangay-management-system.onrender.com';
+                        || 'https://baralink-site.onrender.com';
                     return cloudUrl.replace(/\/+$/, '');
                 }
 
                 // Render static site or alternate domain without backend — redirect to the cloud API
-                if (hostname.endsWith('.onrender.com') && hostname !== 'barangay-management-system.onrender.com') {
+                if (hostname.endsWith('.onrender.com') && hostname !== 'baralink-site.onrender.com') {
                     const cloudUrl = (window.__BMS_CONFIG__ && window.__BMS_CONFIG__.CLOUD_API_URL)
-                        || 'https://barangay-management-system.onrender.com';
+                        || 'https://baralink-site.onrender.com';
                     return cloudUrl.replace(/\/+$/, '');
                 }
 

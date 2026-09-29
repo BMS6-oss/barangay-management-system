@@ -205,7 +205,7 @@ async function runTests() {
             origin: 'https://bms6-oss.github.io'
         };
         eval(sqliteApiCode);
-        assert(window.BMSSQLite.getBaseUrl() === 'https://barangay-management-system.onrender.com', "GitHub Pages automatically resolves to cloud API backend");
+        assert(window.BMSSQLite.getBaseUrl() === 'https://baralink-site.onrender.com', "GitHub Pages automatically resolves to cloud API backend");
 
         // Simulate localStorage custom URL
         window.BMSSQLite.setBaseUrl('https://my-custom-bms.gov.ph');

@@ -2424,7 +2424,7 @@
             <div id="apiConfigPanel" style="display: none; margin-top: 0.5rem; padding: 0.75rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 0.8rem; text-align: left;">
                 <label style="display:block; margin-bottom: 0.25rem; font-weight: 600; color: #334155;">API Base URL:</label>
                 <div style="display:flex; gap: 0.5rem;">
-                    <input type="text" id="customApiUrlInput" placeholder="https://barangay-management-system.onrender.com" style="flex:1; padding: 0.35rem 0.5rem; font-size: 0.8rem; border: 1px solid #cbd5e1; border-radius: 4px;">
+                    <input type="text" id="customApiUrlInput" placeholder="https://baralink-site.onrender.com" style="flex:1; padding: 0.35rem 0.5rem; font-size: 0.8rem; border: 1px solid #cbd5e1; border-radius: 4px;">
                     <button type="button" class="btn btn-primary" id="saveApiUrlBtn" style="padding: 0.35rem 0.75rem; font-size: 0.75rem;" onclick="saveCustomApiUrl()">Save</button>
                 </div>
                 <small style="color: #64748b; display:block; margin-top: 0.35rem;" id="currentApiUrlDisplay"></small>
@@ -6166,7 +6166,7 @@
                 showToast('success', actionType === 'progress' ? 'Progress updated.' : 'Clarification request sent.');
                 closeModal('taskUpdateModal');
                 $('taskUpdateForm').reset();
-                if (currentUser.role === 'staff') loadStaffTasks();
+                if (currentUser && currentUser.role === 'staff') loadStaffTasks();
                 else loadPbTasks();
             } catch (err) {
                 showToast('danger', err.message || 'Failed to submit update.');
@@ -7245,7 +7245,7 @@
                     else if (eventType === 'blotter:filed') showToast('success', `Blotter filed. Reference: ${result.requestId}`);
                     else showToast('success', 'Record saved to the database.');
                     form.reset();
-                    if (currentUser.role === 'admin') loadResidentIdSettings();
+                    if (currentUser && currentUser.role === 'admin') loadResidentIdSettings();
                     await Promise.allSettled([loadResidents(), loadRequests(), loadTasks(), loadCertificates()]);
                     refreshRoleDashboards();
                     loadNotifications();

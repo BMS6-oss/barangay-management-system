@@ -38,7 +38,6 @@ _allowed_origins = os.getenv(
     'BMS_ALLOWED_ORIGINS',
     f'http://127.0.0.1:{PORT},http://localhost:{PORT},'
     f'https://bms6-oss.github.io,'
-    f'https://barangay-management-system.onrender.com,'
     f'https://baralink-site.onrender.com,',
 )
 _origins_list = [origin.strip().rstrip('/') for origin in _allowed_origins.split(',') if origin.strip()]
