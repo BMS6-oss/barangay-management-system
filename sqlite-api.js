@@ -324,6 +324,9 @@ window.BMSSQLite = (() => {
         getHeroImageSettings() {
             return request('/api/admin/hero-image');
         },
+        deleteResidentProfilePhoto() {
+            return this.removeResidentProfilePhoto();
+        },
         uploadHeroImage(payload) {
             return request('/api/admin/hero-image', { method: 'POST', body: JSON.stringify(payload) });
         },
@@ -391,40 +394,62 @@ window.BMSSQLite = (() => {
         deleteAdminOfficial(id) {
             return this.deleteOfficial(id);
         },
-        reorderOfficials(order) {
-            return request('/api/admin/officials/reorder', { method: 'PUT', body: JSON.stringify({ order }) });
-        },
         reorderAdminOfficials(items) {
             return request('/api/admin/officials/reorder', { method: 'PUT', body: JSON.stringify({ items }) });
         },
         // ── Admin Gallery CRUD ───────────────────────────────────────────
-        getAdminGallery() {
-            return request('/api/admin/gallery');
+        getAdminGallery(filter = '') {
+            const qs = filter ? `?${new URLSearchParams(typeof filter === 'string' ? { filter } : filter).toString()}` : '';
+            return request(`/api/admin/gallery${qs}`);
         },
         createGalleryItem(payload) {
             return request('/api/admin/gallery', { method: 'POST', body: JSON.stringify(payload) });
         },
+        createAdminGalleryItem(payload) {
+            return this.createGalleryItem(payload);
+        },
         updateGalleryItem(id, payload) {
             return request(`/api/admin/gallery/${id}`, { method: 'PUT', body: JSON.stringify(payload) });
+        },
+        updateAdminGalleryItem(id, payload) {
+            return this.updateGalleryItem(id, payload);
         },
         archiveGalleryItem(id) {
             return request(`/api/admin/gallery/${id}/archive`, { method: 'POST', body: JSON.stringify({}) });
         },
+        archiveAdminGalleryItem(id) {
+            return this.archiveGalleryItem(id);
+        },
         restoreGalleryItem(id) {
             return request(`/api/admin/gallery/${id}/restore`, { method: 'POST', body: JSON.stringify({}) });
+        },
+        restoreAdminGalleryItem(id) {
+            return this.restoreGalleryItem(id);
         },
         deleteGalleryItem(id) {
             return request(`/api/admin/gallery/${id}`, { method: 'DELETE' });
         },
+        deleteAdminGalleryItem(id) {
+            return this.deleteGalleryItem(id);
+        },
         reorderGallery(order) {
             return request('/api/admin/gallery/reorder', { method: 'PUT', body: JSON.stringify({ order }) });
+        },
+        reorderAdminGallery(items) {
+            return this.reorderGallery(items);
         },
         // ── Admin Website Settings (CMS) ─────────────────────────────────
         getWebsiteSettings() {
             return request('/api/admin/website-settings');
         },
+        getAdminWebsiteSettings() {
+            return this.getWebsiteSettings();
+        },
         saveWebsiteSettings(settings) {
             return request('/api/admin/website-settings', { method: 'PUT', body: JSON.stringify(settings) });
+        },
+        updateAdminWebsiteSettings(settings) {
+            return this.saveWebsiteSettings(settings);
         },
         // ── Resident Profile Picture ─────────────────────────────────────
         uploadResidentProfilePhoto(dataUri) {
@@ -432,9 +457,6 @@ window.BMSSQLite = (() => {
         },
         removeResidentProfilePhoto() {
             return request('/api/resident/profile-photo', { method: 'DELETE' });
-        },
-        adminUploadResidentPhoto(residentId, dataUri) {
-            return request(`/api/admin/residents/${residentId}/profile-photo`, { method: 'POST', body: JSON.stringify({ data: dataUri }) });
         },
         adminRemoveResidentPhoto(residentId) {
             return request(`/api/admin/residents/${residentId}/profile-photo`, { method: 'DELETE' });
@@ -446,21 +468,9 @@ window.BMSSQLite = (() => {
         pbStaff() {
             return request('/api/punong-barangay/staff');
         },
-        getNotificationsUnreadCount() {
-            return request('/api/notifications/unread-count');
-        },
-        markAllNotificationsRead() {
-            return request('/api/notifications/mark-all-read', { method: 'POST', body: JSON.stringify({}) });
-        },
         // ── Task Assignment & Workflow ───────────────────────────────────
-        getTasks() {
-            return request('/api/tasks');
-        },
         pbTasks() {
             return request('/api/punong-barangay/tasks');
-        },
-        createTask(payload) {
-            return request('/api/tasks', { method: 'POST', body: JSON.stringify(payload) });
         },
         createPbTask(payload) {
             return request('/api/punong-barangay/tasks', { method: 'POST', body: JSON.stringify(payload) });
@@ -470,12 +480,6 @@ window.BMSSQLite = (() => {
         },
         getTaskDetails(id) {
             return request(`/api/tasks/${id}`);
-        },
-        updateTask(id, payload) {
-            return request(`/api/tasks/${id}`, { method: 'PUT', body: JSON.stringify(payload) });
-        },
-        assignTask(id, payload) {
-            return request(`/api/tasks/${id}/assign`, { method: 'POST', body: JSON.stringify(payload) });
         },
         updateTaskStatus(id, status) {
             return request(`/api/tasks/${id}/status`, { method: 'POST', body: JSON.stringify({ status }) });

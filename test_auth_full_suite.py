@@ -84,7 +84,7 @@ def run_suite():
 
     # --- Test 1: Valid Administrator Credentials ---
     print("\n[Test 1] Valid Administrator Credentials")
-    status, body, _ = post_json('/api/login', {'identifier': 'admin', 'password': 'admin'})
+    status, body, _ = post_json('/api/login', {'identifier': 'admin', 'password': 'admin123'})
     token = body.get('token')
     user = body.get('user', {})
     assert_test(status == 200, "Login returns HTTP 200 OK", f"Status: {status}")
@@ -148,7 +148,7 @@ def run_suite():
 
     # --- Test 8: HTTP Method & 405 Absence on Login Endpoint ---
     print("\n[Test 8] HTTP Method Verification on /api/login")
-    status, _, _ = post_json('/api/login', {'identifier': 'admin', 'password': 'admin'})
+    status, _, _ = post_json('/api/login', {'identifier': 'admin', 'password': 'admin123'})
     assert_test(status == 200, "POST /api/login returns HTTP 200 (NOT 405 Method Not Allowed)", f"Status: {status}")
 
     # --- Test 9: CORS Handling for GitHub Pages Origin ---

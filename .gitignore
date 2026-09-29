@@ -110,3 +110,11 @@ _inspect_db*
 scratch/
 tmp/
 temp/
+test_debug*.py
+test_investigate*.py
+test_passwords*.py
+test_dashboard*.py
+test_login*.py
+test_notifications*.py
+check.js
+script_test*.js

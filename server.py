@@ -1195,6 +1195,19 @@ class Handler(BaseHTTPRequestHandler):
     def log_message(self, format, *args):
         logging.info("%s - %s", self.client_address[0], format % args)
 
+    def handle_one_request(self):
+        """Override to catch unhandled exceptions in do_* methods."""
+        try:
+            super().handle_one_request()
+        except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError):
+            pass
+        except Exception as e:
+            logging.exception('Unhandled server error: %s %s — %s', self.command, self.path, e)
+            try:
+                json_response(self, 500, {'error': 'Internal server error', 'success': False})
+            except Exception:
+                pass
+
     def do_OPTIONS(self):
         """Handle CORS preflight requests from the browser."""
         self.send_response(204)
@@ -1234,11 +1247,9 @@ class Handler(BaseHTTPRequestHandler):
     def require_user(self, roles=()):
         user = self.user()
         if not user:
-            json_response(self, 401, {'error': 'Unauthorized'})
-            return None
+            return json_response(self, 401, {'error': 'Unauthorized'})
         if roles and user['role'] not in roles:
-            json_response(self, 403, {'error': 'Forbidden'})
-            return None
+            return json_response(self, 403, {'error': 'Forbidden'})
         return user
 
     # ------------------------------------------------------------------
@@ -1656,7 +1667,7 @@ class Handler(BaseHTTPRequestHandler):
                     issued = connection.execute("SELECT COUNT(*) AS n FROM certificate_issuances").fetchone()['n']
                     programs_upcoming = connection.execute("SELECT COUNT(*) AS n FROM programs WHERE status IN ('Scheduled', 'Ongoing') AND event_date >= ?", (today(),)).fetchone()['n']
                 return json_response(self, 200, {'residents': residents, 'households': households, 'users': users, 'requests': requests, 'pending': pending, 'approved': approved, 'announcements': announcements, 'tasks': tasks, 'issued': issued, 'programs': programs_upcoming})
-            return json_response(self, 403, {'error': 'Forbidden'})
+            return json_response(self, 401, {'error': 'Unauthorized'})
         if path == '/api/staff-summary':
             user = self.require_user(('admin', 'staff'))
             if not user:
@@ -1871,7 +1882,8 @@ class Handler(BaseHTTPRequestHandler):
                     WHERE n.user_id = ?
                     ORDER BY n.id DESC LIMIT 50
                 """, (user['id'],)).fetchall()
-            return json_response(self, 200, [dict(r) for r in rows])
+                unread = connection.execute('SELECT COUNT(*) AS n FROM notifications WHERE user_id = ? AND is_read = 0', (user['id'],)).fetchone()['n']
+            return json_response(self, 200, {'items': [dict(r) for r in rows], 'unread': unread})
 
         if path in ('/api/messages', '/api/messages/conversations'):
             user = self.require_user(('punong_barangay', 'staff', 'admin'))
@@ -2249,11 +2261,6 @@ class Handler(BaseHTTPRequestHandler):
                 'recentLogs': [dict(al) for al in audit_rows]
             })
 
-        if path == '/api/notifications':
-            with db() as connection:
-                rows = connection.execute('SELECT id, title, body, notification_type, is_read, created_at FROM notifications WHERE user_id = ? ORDER BY id DESC LIMIT 50', (user['id'],)).fetchall()
-                unread = connection.execute('SELECT COUNT(*) AS n FROM notifications WHERE user_id = ? AND is_read = 0', (user['id'],)).fetchone()['n']
-            return json_response(self, 200, {'items': [dict(row) for row in rows], 'unread': unread})
         if path == '/api/users':
             if user['role'] != 'admin':
                 return json_response(self, 403, {'error': 'Forbidden'})
@@ -3197,14 +3204,6 @@ class Handler(BaseHTTPRequestHandler):
                 connection.execute("UPDATE message_recipients SET is_read = 1, read_at = ? WHERE recipient_id = ? AND is_read = 0", (now(), user['id']))
                 connection.execute("UPDATE notifications SET is_read = 1 WHERE user_id = ? AND is_read = 0 AND (notification_type IN ('message', 'task') OR related_type IN ('message', 'task'))", (user['id'],))
             return json_response(self, 200, {'ok': True, 'message': 'All messages marked as read.'})
-
-        if path == '/api/notifications/mark-all-read' or path == '/api/notifications/read':
-            user = self.require_user()
-            if not user:
-                return
-            with db() as connection:
-                connection.execute("UPDATE notifications SET is_read = 1 WHERE user_id = ? AND is_read = 0", (user['id'],))
-            return json_response(self, 200, {'ok': True, 'message': 'All notifications marked as read.'})
 
         if path.startswith('/api/messages/') and path.endswith('/read'):
             user = self.require_user(('punong_barangay', 'staff', 'admin'))

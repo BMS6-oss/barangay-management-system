@@ -17,7 +17,7 @@ def req(url, method='GET', data=None, token=None):
         return None
 
 # Login
-login_res = req('/api/login', method='POST', data={'username': 'admin', 'password': 'admin'})
+login_res = req('/api/login', method='POST', data={'username': 'admin', 'password': 'admin123'})
 if not login_res:
     print("Login failed")
     exit(1)
