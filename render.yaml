@@ -11,7 +11,7 @@ databases:
 
 services:
   - type: web
-    name: barangay-management-system
+    name: baralink-site
     runtime: docker
     plan: starter
     region: oregon
