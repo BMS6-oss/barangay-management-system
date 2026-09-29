@@ -46,10 +46,15 @@ window.BMSSQLite = (() => {
                 const hostname = (window.location.hostname || '').toLowerCase();
                 const protocol = (window.location.protocol || '').toLowerCase();
 
-                // Static host detection (e.g., GitHub Pages or raw git CDN):
-                // Static web servers cannot execute Python or accept POST requests.
-                // Redirect API calls to the production cloud backend (Render).
+                // Static host detection (e.g., GitHub Pages, raw git CDN):
                 if (hostname.endsWith('github.io') || hostname === 'raw.githubusercontent.com') {
+                    const cloudUrl = (window.__BMS_CONFIG__ && window.__BMS_CONFIG__.CLOUD_API_URL)
+                        || 'https://barangay-management-system.onrender.com';
+                    return cloudUrl.replace(/\/+$/, '');
+                }
+
+                // Render static site or alternate domain without backend — redirect to the cloud API
+                if (hostname.endsWith('.onrender.com') && hostname !== 'barangay-management-system.onrender.com') {
                     const cloudUrl = (window.__BMS_CONFIG__ && window.__BMS_CONFIG__.CLOUD_API_URL)
                         || 'https://barangay-management-system.onrender.com';
                     return cloudUrl.replace(/\/+$/, '');
@@ -196,6 +201,9 @@ window.BMSSQLite = (() => {
         },
         async login(identifier, password) {
             const result = await request('/api/login', { method: 'POST', body: JSON.stringify({ identifier, username: identifier, password }) });
+            if (!result || !result.token || !result.user) {
+                throw new Error(result?.error || 'Login response was incomplete. Please try again.');
+            }
             token = result.token;
             if (typeof sessionStorage !== 'undefined' && typeof sessionStorage.setItem === 'function') {
                 sessionStorage.setItem('bmsToken', token);

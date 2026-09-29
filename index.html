@@ -4632,11 +4632,18 @@
         function dismissToast(toastEl) { if (toastEl && toastEl.timeoutId) clearTimeout(toastEl.timeoutId); if (toastEl && toastEl.parentNode) toastEl.parentNode.removeChild(toastEl); }
 
         function fullName(record) {
+            if (!record) return '';
             return [record.first_name, record.middle_name, record.last_name].filter(Boolean).join(' ');
         }
 
         /* ================= SESSION ================= */
         function startSession(user) {
+            if (!user || typeof user !== 'object' || !user.role) {
+                try { sessionStorage.removeItem('bmsToken'); } catch (e) {}
+                currentUser = null;
+                if (window.BMSWelcomeUI) BMSWelcomeUI.showWelcomePage();
+                return;
+            }
             currentUser = user;
             const welcomePage = document.getElementById('welcomeLandingPage');
             if (welcomePage) welcomePage.style.display = 'none';
@@ -4704,6 +4711,7 @@
         }
 
         function showRoleDashboard() {
+            if (!currentUser) { showView('welcomeLandingPage'); return; }
             if (currentUser.role === 'punong_barangay') {
                 showView('pb-dashboard');
             } else {
@@ -4775,6 +4783,7 @@
 
         /* ================= GLOBAL REFRESH ================= */
         async function refreshAllData() {
+            if (!currentUser) return;
             loadNotifications();
             if (currentUser.role === 'punong_barangay') loadPbDashboard();
             if (currentUser.role === 'admin') refreshAdminDashboard();
@@ -4790,7 +4799,12 @@
         async function refreshAdminDashboard() {
             try {
                 const summary = await api.dashboardSummary();
-                Object.entries(summary).forEach(([key, value]) => {
+                if (!summary || typeof summary !== 'object') {
+                    showDashboardError('dashboard-summary', new Error('Invalid dashboard summary response from server.'));
+                    return;
+                }
+                const entries = (summary.stats || summary);
+                Object.entries(entries).forEach(([key, value]) => {
                     const node = document.querySelector(`[data-stat="${key}"]`);
                     if (node) node.textContent = Number(value).toLocaleString('en-US');
                 });
@@ -4890,6 +4904,7 @@
         async function refreshStaffDashboard() {
             try {
                 const summary = await api.staffSummary();
+                if (!summary || typeof summary !== 'object') return;
                 Object.entries(summary).forEach(([key, value]) => {
                     const node = document.querySelector(`[data-stat="${key}"]`);
                     if (node) node.textContent = Number(value).toLocaleString('en-US');
@@ -4917,6 +4932,7 @@
         async function refreshResidentDashboard() {
             try {
                 const summary = await api.mySummary();
+                if (!summary || typeof summary !== 'object') return;
                 Object.entries(summary).forEach(([key, value]) => {
                     const node = document.querySelector(`[data-stat="${key}"]`);
                     if (node) node.textContent = Number(value).toLocaleString('en-US');
@@ -5673,6 +5689,10 @@
             if (!currentUser || !['punong_barangay', 'admin'].includes(currentUser.role)) return;
             try {
                 const d = await api.pbDashboard();
+                if (!d || typeof d !== 'object') {
+                    if ($('pbFullActivityList')) $('pbFullActivityList').innerHTML = '<div class="empty-state">Unable to load Punong Barangay dashboard data.</div>';
+                    return;
+                }
                 if ($('pbTotalStaff')) $('pbTotalStaff').textContent = d.totalStaff;
                 if ($('pbAvailableStaff')) $('pbAvailableStaff').textContent = d.availableStaff;
                 if ($('pbAssignedTasks')) $('pbAssignedTasks').textContent = d.assignedTasks;

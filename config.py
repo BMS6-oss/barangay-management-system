@@ -36,7 +36,10 @@ PORT = int(os.getenv('PORT', os.getenv('BMS_PORT', '8000')))
 API_BASE_URL = os.getenv('API_BASE_URL', os.getenv('BMS_API_BASE_URL', '')).rstrip('/')
 _allowed_origins = os.getenv(
     'BMS_ALLOWED_ORIGINS',
-    f'http://127.0.0.1:{PORT},http://localhost:{PORT},https://bms6-oss.github.io',
+    f'http://127.0.0.1:{PORT},http://localhost:{PORT},'
+    f'https://bms6-oss.github.io,'
+    f'https://barangay-management-system.onrender.com,'
+    f'https://baralink-site.onrender.com,',
 )
 _origins_list = [origin.strip().rstrip('/') for origin in _allowed_origins.split(',') if origin.strip()]
 if os.getenv('APP_URL'):

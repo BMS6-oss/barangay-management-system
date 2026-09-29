@@ -10,6 +10,7 @@
  */
 window.__BMS_CONFIG__ = Object.assign(window.__BMS_CONFIG__ || {}, {
     // Cloud API endpoint used when frontend is deployed on a static host (e.g. GitHub Pages)
+    // or when same-origin backend is not available (e.g. Render Static Site)
     CLOUD_API_URL: 'https://barangay-management-system.onrender.com',
 
     // Explicit API Base URL override. If set, all requests go directly to this URL.
