@@ -803,7 +803,10 @@ def allow_rate(handler, bucket, limit, window=RATE_LIMIT_WINDOW_SECONDS):
     """Apply a small process-local abuse guard; use an edge limiter for multi-instance deployments."""
     if not config.RATE_LIMIT_ENABLED or limit <= 0:
         return True
-    key = (bucket, client_ip(handler))
+    ip = client_ip(handler)
+    if ip in ('127.0.0.1', '::1', 'localhost') and not (os.getenv('RENDER') or os.getenv('DOCKER')):
+        return True
+    key = (bucket, ip)
     current = time.monotonic()
     with RATE_LIMIT_LOCK:
         timestamps = [stamp for stamp in RATE_LIMIT_STATE.get(key, []) if current - stamp < window]
@@ -1440,7 +1443,7 @@ class Handler(BaseHTTPRequestHandler):
                     'programs': prog_count
                 }
             })
-        if path == '/api/public/officials':
+        if path in ('/api/public/officials', '/api/public/official'):
             with db() as connection:
                 rows = connection.execute('''
                     SELECT id, first_name, middle_name, last_name, suffix, position, bio, contact_info, profile_image, display_order, status
@@ -1472,7 +1475,7 @@ class Handler(BaseHTTPRequestHandler):
                     'status': (r['status'] or 'active').lower()
                 })
             return json_response(self, 200, officials)
-        if path == '/api/public/gallery':
+        if path in ('/api/public/gallery', '/api/public/galleries'):
             with db() as connection:
                 rows = connection.execute('''
                     SELECT id, image_path, thumbnail_path, caption, description, display_order
@@ -1548,7 +1551,7 @@ class Handler(BaseHTTPRequestHandler):
                 ]
                 settings = {k: get_setting(connection, k, '') for k in keys}
             return json_response(self, 200, settings)
-        if path == '/api/public/protection-settings':
+        if path in ('/api/public/protection-settings', '/api/public/protection'):
             with db() as connection:
                 ps = get_protection_settings(connection)
             # Only expose non-sensitive display settings to the public
@@ -1584,11 +1587,11 @@ class Handler(BaseHTTPRequestHandler):
                 'heroImageProtectedPath': hero_protected or hero_image,
                 'defaultHeroImage': './assets/hero1.jpg'
             })
-        if path == '/api/public/announcements':
+        if path in ('/api/public/announcements', '/api/public/announcement'):
             with db() as connection:
                 rows = connection.execute("SELECT id, title, body, category, priority, created_at FROM announcements WHERE archived_at IS NULL ORDER BY id DESC LIMIT 10").fetchall()
             return json_response(self, 200, [dict(r) for r in rows])
-        if path == '/api/public/programs':
+        if path in ('/api/public/programs', '/api/public/program'):
             with db() as connection:
                 rows = connection.execute("SELECT event_id, title, description, event_date, start_time, end_time, location, organizer, status FROM programs WHERE status != 'Archived' ORDER BY event_date DESC, id DESC LIMIT 10").fetchall()
             return json_response(self, 200, [dict(r) for r in rows])
@@ -1666,7 +1669,39 @@ class Handler(BaseHTTPRequestHandler):
                     tasks = connection.execute("SELECT COUNT(*) AS n FROM tasks WHERE lower(status) NOT IN ('done', 'cancelled', 'completed')").fetchone()['n']
                     issued = connection.execute("SELECT COUNT(*) AS n FROM certificate_issuances").fetchone()['n']
                     programs_upcoming = connection.execute("SELECT COUNT(*) AS n FROM programs WHERE status IN ('Scheduled', 'Ongoing') AND event_date >= ?", (today(),)).fetchone()['n']
-                return json_response(self, 200, {'residents': residents, 'households': households, 'users': users, 'requests': requests, 'pending': pending, 'approved': approved, 'announcements': announcements, 'tasks': tasks, 'issued': issued, 'programs': programs_upcoming})
+                    birth_dates = connection.execute("SELECT birth_date FROM residents WHERE archived_at IS NULL").fetchall()
+                    latest_announcements = connection.execute("SELECT title, category, priority, created_at FROM announcements WHERE archived_at IS NULL ORDER BY id DESC LIMIT 4").fetchall()
+                age_groups = {'under_18': 0, '18_to_59': 0, '60_plus': 0, 'unknown': 0}
+                current_date = datetime.fromisoformat(today()).date()
+                for resident in birth_dates:
+                    try:
+                        birth_date = datetime.fromisoformat(str(resident['birth_date'])[:10]).date()
+                    except (TypeError, ValueError):
+                        age_groups['unknown'] += 1
+                        continue
+                    age = current_date.year - birth_date.year - ((current_date.month, current_date.day) < (birth_date.month, birth_date.day))
+                    if age < 0:
+                        age_groups['unknown'] += 1
+                    elif age < 18:
+                        age_groups['under_18'] += 1
+                    elif age < 60:
+                        age_groups['18_to_59'] += 1
+                    else:
+                        age_groups['60_plus'] += 1
+                return json_response(self, 200, {
+                    'residents': residents,
+                    'households': households,
+                    'users': users,
+                    'requests': requests,
+                    'pending': pending,
+                    'approved': approved,
+                    'announcements': announcements,
+                    'tasks': tasks,
+                    'issued': issued,
+                    'programs': programs_upcoming,
+                    'ageGroups': age_groups,
+                    'latestAnnouncements': [dict(row) for row in latest_announcements],
+                })
             return json_response(self, 401, {'error': 'Unauthorized'})
         if path == '/api/staff-summary':
             user = self.require_user(('admin', 'staff'))
@@ -2371,6 +2406,8 @@ class Handler(BaseHTTPRequestHandler):
             '/api/activity-logs': ('activity_logs', ('admin',)),
         }
         if path not in collections:
+            if path.startswith('/api/'):
+                return json_response(self, 404, {'error': f'API endpoint not found: {path}', 'code': 'ENDPOINT_NOT_FOUND'})
             return self.serve_static()
         table, roles = collections[path]
         if user['role'] not in roles:

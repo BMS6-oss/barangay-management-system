@@ -474,6 +474,20 @@
             color: white;
         }
 
+        .mobile-nav-toggle {
+            display: none;
+            align-items: center;
+            gap: 0.4rem;
+            min-height: 40px;
+            padding: 0.4rem 0.65rem;
+            border: 1px solid var(--bms-border);
+            border-radius: 6px;
+            background: var(--bms-bg);
+            color: var(--bms-forest);
+            font-weight: 700;
+            cursor: pointer;
+        }
+
         /* ========== APP CONTAINER & LAYOUT ========== */
         .app-container {
             display: none;
@@ -590,7 +604,8 @@
             box-shadow: 0 2px 12px rgba(36, 51, 34, 0.07);
             min-height: 500px;
             border: 1px solid var(--bms-border);
-            flex: 1;
+            /* flex: 1 removed — parent is CSS Grid, not flexbox */
+            width: 100%;
         }
 
         /* ========== DASHBOARD ENHANCEMENTS ========== */
@@ -1642,7 +1657,7 @@
             .brand h1 { font-size: 1rem; }
 
             .stats-grid {
-                grid-template-columns: repeat(3, 1fr);
+                grid-template-columns: repeat(2, minmax(0, 1fr));
             }
 
             .event-row { grid-template-columns: 1fr; }
@@ -1652,6 +1667,20 @@
 
         @media (max-width: 768px) {
             .sidebar { position: static; }
+
+            .mobile-nav-toggle { display: inline-flex; }
+
+            .sidebar { display: none !important; max-height: 55vh; overflow-y: auto; }
+
+            .sidebar.mobile-open { display: block !important; }
+
+            .header-right { width: 100%; flex-wrap: wrap; justify-content: space-between; gap: 0.6rem; }
+
+            .user-info { flex: 1; justify-content: flex-end; min-width: 0; gap: 0.5rem; }
+
+            .user-details { min-width: 0; }
+
+            .user-name { overflow-wrap: anywhere; }
 
             .brand h1 { font-size: 0.95rem; }
 
@@ -2446,6 +2475,7 @@
                 </div>
             </div>
             <div class="header-right">
+                <button class="mobile-nav-toggle" id="mobileNavToggle" type="button" aria-expanded="false" onclick="toggleMobileNav()">☰ <span>Menu</span></button>
                 <div style="position:relative;">
                     <button class="notif-bell" id="notifBell" title="Notifications">🔔
                         <span class="notif-badge" id="notifBadge">0</span>
@@ -2500,7 +2530,7 @@
                         <li><a href="#admin-website-cms">🌐 Public Website CMS <span
                                     class="admin-badge">ADMIN</span></a></li>
                         <li><a href="#admin-pb-oversight">🏛️ PB & Staff Oversight <span class="admin-badge">ADMIN</span></a></li>
-                        <li><a href="#admin-settings">🔧 TEST Settings</a></li>
+                        <li><a href="#admin-settings">🔧 Settings</a></li>
                     </ul>
                 </aside>
 
@@ -2645,42 +2675,42 @@
                             <div class="stat-card">
                                 <span class="stat-icon">👥</span>
                                 <h4>Total Residents</h4>
-                                <div class="num" data-stat="residents">0</div>
+                                <div class="num" data-stat="residents">Loading...</div>
                             </div>
                             <div class="stat-card green">
                                 <span class="stat-icon">🏠</span>
                                 <h4>Households</h4>
-                                <div class="num" data-stat="households">0</div>
+                                <div class="num" data-stat="households">Loading...</div>
                             </div>
                             <div class="stat-card purple">
                                 <span class="stat-icon">👤</span>
                                 <h4>Registered Users</h4>
-                                <div class="num" data-stat="users">0</div>
+                                <div class="num" data-stat="users">Loading...</div>
                             </div>
                             <div class="stat-card gold">
                                 <span class="stat-icon">📄</span>
                                 <h4>Certificates Issued</h4>
-                                <div class="num" data-stat="issued">0</div>
+                                <div class="num" data-stat="issued">Loading...</div>
                             </div>
                             <div class="stat-card red">
                                 <span class="stat-icon">⏳</span>
                                 <h4>Pending Requests</h4>
-                                <div class="num" data-stat="pending">0</div>
+                                <div class="num" data-stat="pending">Loading...</div>
                             </div>
                             <div class="stat-card green">
                                 <span class="stat-icon">📅</span>
                                 <h4>Upcoming Programs</h4>
-                                <div class="num" data-stat="programs">0</div>
+                                <div class="num" data-stat="programs">Loading...</div>
                             </div>
                             <div class="stat-card gold">
                                 <span class="stat-icon">📋</span>
                                 <h4>Total Requests</h4>
-                                <div class="num" data-stat="requests">0</div>
+                                <div class="num" data-stat="requests">Loading...</div>
                             </div>
                             <div class="stat-card green">
                                 <span class="stat-icon">📢</span>
                                 <h4>Active Announcements</h4>
-                                <div class="num" data-stat="announcements">0</div>
+                                <div class="num" data-stat="announcements">Loading...</div>
                             </div>
                         </div>
 
@@ -2741,6 +2771,21 @@
                                 <div class="panel-head">📋 PENDING REQUESTS</div>
                                 <div class="panel-body" id="adminPendingRequestsList">
                                     <div class="empty-state">Loading…</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="dashboard-row">
+                            <div class="panel">
+                                <div class="panel-head green">👥 RESIDENT AGE GROUPS</div>
+                                <div class="panel-body" id="adminAgeGroupsList">
+                                    <div class="empty-state">Loading...</div>
+                                </div>
+                            </div>
+                            <div class="panel">
+                                <div class="panel-head gold">📢 RECENT ANNOUNCEMENTS</div>
+                                <div class="panel-body" id="adminLatestAnnouncementsList">
+                                    <div class="empty-state">Loading...</div>
                                 </div>
                             </div>
                         </div>
@@ -4636,6 +4681,19 @@
             return [record.first_name, record.middle_name, record.last_name].filter(Boolean).join(' ');
         }
 
+        function toggleMobileNav() {
+            const sidebar = [...document.querySelectorAll('.sidebar')].find(item => item.style.display === 'block');
+            const toggle = $('mobileNavToggle');
+            if (!sidebar || !toggle) return;
+            toggle.setAttribute('aria-expanded', String(sidebar.classList.toggle('mobile-open')));
+        }
+
+        function closeMobileNav() {
+            document.querySelectorAll('.sidebar.mobile-open').forEach(sidebar => sidebar.classList.remove('mobile-open'));
+            const toggle = $('mobileNavToggle');
+            if (toggle) toggle.setAttribute('aria-expanded', 'false');
+        }
+
         /* ================= SESSION ================= */
         function startSession(user) {
             if (!user || typeof user !== 'object' || !user.role) {
@@ -4661,7 +4719,11 @@
                 : `Welcome back, ${user.name}`;
             $('programOrganizer').value = user.name;
 
-            document.querySelectorAll('.sidebar').forEach(s => s.style.display = 'none');
+            document.querySelectorAll('.sidebar').forEach(s => {
+                s.style.display = 'none';
+                s.classList.remove('mobile-open');
+            });
+            closeMobileNav();
             if (user.role === 'punong_barangay') {
                 const pbSb = $('sidebarPunong_barangay');
                 if (pbSb) pbSb.style.display = 'block';
@@ -4772,6 +4834,7 @@
                 e.preventDefault();
                 const target = link.getAttribute('href').replace('#', '');
                 const sb = link.closest('.sidebar');
+                closeMobileNav();
                 hideAllViews();
                 $(target).style.display = 'block';
                 sb.querySelectorAll('a').forEach(a => a.classList.remove('active'));
@@ -4797,20 +4860,72 @@
 
         /* ================= DASHBOARD LOADERS ================= */
         async function refreshAdminDashboard() {
+            const statNodes = document.querySelectorAll('#admin-dashboard [data-stat]');
+            statNodes.forEach(node => { node.textContent = 'Loading...'; });
+            $('adminAgeGroupsList').innerHTML = '<div class="empty-state">Loading...</div>';
+            $('adminLatestAnnouncementsList').innerHTML = '<div class="empty-state">Loading...</div>';
             try {
                 const summary = await api.dashboardSummary();
                 if (!summary || typeof summary !== 'object') {
-                    showDashboardError('dashboard-summary', new Error('Invalid dashboard summary response from server.'));
-                    return;
+                    throw new Error('Invalid dashboard summary response from server.');
                 }
                 const entries = (summary.stats || summary);
-                Object.entries(entries).forEach(([key, value]) => {
-                    const node = document.querySelector(`[data-stat="${key}"]`);
-                    if (node) node.textContent = Number(value).toLocaleString('en-US');
+                const ageGroups = summary.ageGroups;
+                const ageGroupKeys = ['under_18', '18_to_59', '60_plus', 'unknown'];
+                if (!ageGroups || ageGroupKeys.some(key => !Number.isFinite(Number(ageGroups[key]))) || !Array.isArray(summary.latestAnnouncements)) {
+                    throw new Error('Dashboard demographic or announcement data is incomplete.');
+                }
+                statNodes.forEach(node => {
+                    const value = entries[node.dataset.stat];
+                    if (value === undefined || value === null || value === '' || !Number.isFinite(Number(value))) {
+                        throw new Error(`Dashboard summary is missing a valid ${node.dataset.stat} value.`);
+                    }
+                    node.textContent = Number(value).toLocaleString('en-US');
                 });
+                document.querySelector('.stats-grid .dashboard-summary-error')?.remove();
+
+                const ageGroupRows = [
+                    ['Under 18', ageGroups.under_18],
+                    ['18 to 59', ageGroups['18_to_59']],
+                    ['60 and older', ageGroups['60_plus']],
+                    ['Age not recorded', ageGroups.unknown]
+                ];
+                const ageGroupTotal = ageGroupRows.reduce((total, [, count]) => total + Number(count), 0);
+                const ageGroupHost = $('adminAgeGroupsList');
+                ageGroupHost.innerHTML = '';
+                if (!ageGroupTotal) {
+                    ageGroupHost.appendChild(el('div', 'empty-state', 'No resident age data available.'));
+                } else {
+                    ageGroupRows.forEach(([label, count]) => {
+                        const item = el('div', 'task-item');
+                        const details = el('div');
+                        details.appendChild(el('strong', null, label));
+                        details.appendChild(el('div', 'task-meta', `${Math.round(Number(count) / ageGroupTotal * 100)}% of active residents`));
+                        item.append(details, el('strong', null, Number(count).toLocaleString('en-US')));
+                        ageGroupHost.appendChild(item);
+                    });
+                }
+
+                const announcementHost = $('adminLatestAnnouncementsList');
+                announcementHost.innerHTML = '';
+                if (!summary.latestAnnouncements.length) {
+                    announcementHost.appendChild(el('div', 'empty-state', 'No announcements available.'));
+                } else {
+                    summary.latestAnnouncements.forEach(announcement => {
+                        const item = el('div', 'task-item');
+                        const details = el('div');
+                        details.appendChild(el('strong', null, announcement.title || 'Untitled announcement'));
+                        details.appendChild(el('div', 'task-meta', `${fmtDate(announcement.created_at)}${announcement.priority ? ` · ${announcement.priority}` : ''}`));
+                        item.appendChild(details);
+                        announcementHost.appendChild(item);
+                    });
+                }
             } catch (error) {
+                statNodes.forEach(node => { node.textContent = 'Unavailable'; });
                 console.error(error);
                 showDashboardError('dashboard-summary', error);
+                showDashboardError('adminAgeGroupsList', error);
+                showDashboardError('adminLatestAnnouncementsList', error);
             }
             try {
                 const rows = await api.performance();
@@ -4878,9 +4993,16 @@
             if (elementId === 'dashboard-summary') {
                 if (currentUser && currentUser.role === 'admin') {
                     showToast('danger', error.message || 'Unable to load dashboard summary.', 8000);
-                    const retryBanner = el('div', 'error-banner inline', 'Unable to load dashboard summary. <button class="btn btn-sm btn-secondary" onclick="refreshAdminDashboard()">\u21bb Retry</button>');
                     const statContainer = document.querySelector('.stats-grid');
-                    if (statContainer) statContainer.prepend(retryBanner);
+                    if (statContainer) {
+                        statContainer.querySelector('.dashboard-summary-error')?.remove();
+                        const retryBanner = el('div', 'error-banner inline dashboard-summary-error', 'Unable to load dashboard summary.');
+                        const retryButton = el('button', 'btn btn-sm btn-secondary', 'Retry');
+                        retryButton.type = 'button';
+                        retryButton.onclick = refreshAdminDashboard;
+                        retryBanner.appendChild(retryButton);
+                        statContainer.prepend(retryBanner);
+                    }
                 } else if (currentUser && currentUser.role === 'staff') {
                     showToast('danger', error.message || 'Unable to load staff summary.', 8000);
                 }
