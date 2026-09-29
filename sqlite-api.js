@@ -45,6 +45,7 @@ window.BMSSQLite = (() => {
             if (window.location) {
                 const hostname = (window.location.hostname || '').toLowerCase();
                 const protocol = (window.location.protocol || '').toLowerCase();
+                const port = (window.location.port || '').toLowerCase();
 
                 // Static host detection (e.g., GitHub Pages, raw git CDN):
                 if (hostname.endsWith('github.io') || hostname === 'raw.githubusercontent.com') {
@@ -65,9 +66,12 @@ window.BMSSQLite = (() => {
                     return 'http://127.0.0.1:8000';
                 }
 
-                // If running from a local static dev server (like VS Code Live Server on port 5500, 3000, 5173, etc.)
-                if ((hostname === 'localhost' || hostname === '127.0.0.1') && window.location.port && window.location.port !== '8000') {
-                    return 'http://127.0.0.1:8000';
+                // Localhost and default local preview ports usually point to a static UI, not the SQLite backend.
+                // The BMS server itself is started on 127.0.0.1:8000 and exposes all public APIs there.
+                if (hostname === '0.0.0.0' || hostname === 'localhost' || hostname === '127.0.0.1') {
+                    if (!port || port === '80' || port === '443' || port === '3000' || port === '4173' || port === '5500' || port === '8080' || port !== '8000') {
+                        return 'http://127.0.0.1:8000';
+                    }
                 }
 
                 // Standard same-origin hosting (e.g., Render Docker web service or local server.py)
