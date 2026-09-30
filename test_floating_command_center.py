@@ -82,7 +82,7 @@ print("── TC-03: Staff Login & Token ──")
 staff_token = None
 staff_user_id = None
 try:
-    data = req("/api/login", "POST", {"username": "staff", "password": "staff"})
+    data = req("/api/login", "POST", {"username": "staff", "password": "staff123"})
     staff_token = data.get("token")
     staff_user_id = data.get("user", {}).get("id")
     check("TC-03 Staff Login", bool(staff_token), f"role={data.get('user',{}).get('role')}")
@@ -214,6 +214,18 @@ print()
 # ── TC-11: Overdue Task Detection ───────────────────────────
 print("── TC-11: Overdue Task Detected by Server ──")
 try:
+    overdue_due_date = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
+    overdue_result = req("/api/punong-barangay/tasks", "POST", {
+        "title": "TC-11 Automated Overdue Command",
+        "description": "This task has a past deadline for overdue detection testing.",
+        "priority": "HIGH",
+        "dueDate": overdue_due_date,
+        "dueTime": "00:00",
+        "assignedStaffIds": [staff_user_id]
+    }, token=pb_token)
+    overdue_task_id = overdue_result.get("taskId") or overdue_result.get("task_id") or overdue_result.get("id")
+    check("TC-11 Creates overdue test task", bool(overdue_task_id), f"task_id={overdue_task_id}")
+
     pb_tasks = req("/api/punong-barangay/tasks", token=pb_token)
     all_tasks = pb_tasks.get("all", []) + pb_tasks.get("overdue", []) if isinstance(pb_tasks, dict) else pb_tasks
     overdue_tasks = [t for t in all_tasks if t.get("status","").upper() == "OVERDUE"]

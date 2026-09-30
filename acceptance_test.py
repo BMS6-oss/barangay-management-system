@@ -93,10 +93,10 @@ else:
     fail("CORS header missing on OPTIONS response")
 
 # 5. Login with VALID credentials
-print("\n[4] Login with valid credentials (admin/admin)")
-status, body, cors = req("/api/login", method="POST", data={"username": "admin", "password": "admin"})
+print("\n[4] Login with valid credentials (admin/admin123)")
+status, body, cors = req("/api/login", method="POST", data={"username": "admin", "password": "admin123"})
 if status == 200 and body.get("token"):
-    ok("POST /api/login with admin/admin returns token")
+    ok("POST /api/login with admin/admin123 returns token")
     token = body["token"]
 else:
     fail("POST /api/login admin/admin", f"status={status} body={body}")

@@ -347,7 +347,12 @@ CREATE INDEX IF NOT EXISTS idx_task_updates_task ON task_updates(task_id);
 
 def is_postgres() -> bool:
     """Check whether PostgreSQL is configured as the active database engine."""
-    url = getattr(config, 'DATABASE_URL', '') or os.getenv('DATABASE_URL', '')
+    url = (
+        getattr(config, 'DATABASE_URL', '')
+        or os.getenv('DATABASE_URL', '')
+        or os.getenv('BMS_DATABASE_URL', '')
+    )
+    url = (url or '').strip()
     return bool(url and (url.startswith('postgres://') or url.startswith('postgresql://')))
 
 
@@ -580,7 +585,14 @@ def get_postgres_connection():
     """Create and return a PostgreSQL connection wrapped in sqlite-compatible interface."""
     if not PSYCOPG2_AVAILABLE:
         raise RuntimeError("psycopg2-binary is not installed. Please run: pip install psycopg2-binary")
-    url = getattr(config, 'DATABASE_URL', '') or os.getenv('DATABASE_URL', '')
+    url = (
+        getattr(config, 'DATABASE_URL', '')
+        or os.getenv('DATABASE_URL', '')
+        or os.getenv('BMS_DATABASE_URL', '')
+    )
+    if not url:
+        raise RuntimeError("No PostgreSQL DATABASE_URL/BMS_DATABASE_URL configured.")
+    url = url.strip()
     if url.startswith('postgres://'):
         # Normalize Render postgres:// to postgresql:// for compatibility
         url = 'postgresql://' + url[len('postgres://'):]

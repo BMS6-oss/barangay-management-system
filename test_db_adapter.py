@@ -1,10 +1,30 @@
 """Test Suite for Unified Database Adapter (db_adapter.py)
 Validates query translation, RowWrapper, cursor semantics, and PostgreSQL schema definitions.
 """
+import os
 import unittest
+from unittest.mock import patch
 import db_adapter
 
 class TestDbAdapter(unittest.TestCase):
+    def test_postgres_url_selects_postgres_backend(self):
+        with patch.object(db_adapter.config, 'DATABASE_URL', ''):
+            with patch.dict(os.environ, {'DATABASE_URL': 'postgresql://user:pass@localhost/bms', 'BMS_DATABASE_URL': ''}):
+                self.assertTrue(db_adapter.is_postgres())
+                self.assertEqual(db_adapter.get_database_engine(), 'PostgreSQL')
+
+    def test_no_database_url_keeps_sqlite_backend(self):
+        with patch.object(db_adapter.config, 'DATABASE_URL', ''):
+            with patch.dict(os.environ, {'DATABASE_URL': '', 'BMS_DATABASE_URL': ''}):
+                self.assertFalse(db_adapter.is_postgres())
+                self.assertEqual(db_adapter.get_database_engine(), 'SQLite')
+
+    def test_bms_database_url_selects_postgres_backend(self):
+        with patch.object(db_adapter.config, 'DATABASE_URL', ''):
+            with patch.dict(os.environ, {'DATABASE_URL': '', 'BMS_DATABASE_URL': 'postgresql://user:pass@localhost/bms'}):
+                self.assertTrue(db_adapter.is_postgres())
+                self.assertEqual(db_adapter.get_database_engine(), 'PostgreSQL')
+
     def test_query_translation_basic(self):
         q = "SELECT * FROM users WHERE username = ?"
         t = db_adapter.translate_query_to_postgres(q)

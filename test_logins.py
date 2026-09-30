@@ -14,7 +14,7 @@ def login(user, pw):
         print(f'  FAIL {user}/{pw} -> {e.code}: {b.get("error")}')
 
 print('Testing all accounts:')
-login('admin', 'admin')
-login('staff', 'staff')
-login('resident', 'resident')
+login('admin', 'admin123')
+login('staff', 'staff123')
+login('resident', 'resident123')
 login('admin', 'wrongpassword')

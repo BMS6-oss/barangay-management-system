@@ -46,10 +46,11 @@ if os.getenv('APP_URL'):
 ALLOWED_ORIGINS = frozenset(_origins_list)
 
 # Database configuration
-# Production (Render/Docker): PostgreSQL via DATABASE_URL (managed database).
+# Production (Render/Docker): PostgreSQL via DATABASE_URL / BMS_DATABASE_URL.
 # Local development: SQLite via BMS_DATABASE_PATH (defaults to bms.sqlite3).
-# When DATABASE_URL is set, db_adapter uses PostgreSQL and ignores the SQLite path.
-DATABASE_URL = os.getenv('DATABASE_URL', '')
+# When a PostgreSQL connection string is present, db_adapter uses Postgres and
+# ignores the SQLite path. Keep SQLite as the local fallback for development.
+DATABASE_URL = os.getenv('DATABASE_URL', os.getenv('BMS_DATABASE_URL', '')).strip()
 _db_env = os.getenv('BMS_DATABASE_PATH', os.getenv('DATABASE_PATH', ''))
 if _db_env:
     DATABASE_PATH = Path(_db_env).resolve()

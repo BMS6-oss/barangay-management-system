@@ -31,6 +31,10 @@ services:
         fromDatabase:
           name: bms-postgres
           property: connectionString
+      - key: BMS_DATABASE_URL
+        fromDatabase:
+          name: bms-postgres
+          property: connectionString
       - key: BMS_UPLOADS_PATH
         value: /data/uploads
       - key: BMS_ADMIN_PASSWORD

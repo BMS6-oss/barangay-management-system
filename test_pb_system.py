@@ -36,7 +36,7 @@ def run_tests():
 
     # 0. Setup / Login users
     # Admin login
-    status, res = request("/api/login", "POST", {"username": "admin", "password": "admin"})
+    status, res = request("/api/login", "POST", {"username": "admin", "password": "admin123"})
     assert status == 200, f"Admin login failed: {res}"
     admin_token = res["token"]
     admin_id = res["user"]["id"]
@@ -49,7 +49,7 @@ def run_tests():
     print(f"Logged in: PB (ID {pb_id}), Admin (ID {admin_id})")
 
     # Staff login
-    status, res = request("/api/login", "POST", {"username": "staff", "password": "staff"})
+    status, res = request("/api/login", "POST", {"username": "staff", "password": "staff123"})
     assert status == 200, f"Staff login failed: {res}"
     staff_token = res["token"]
     staff_id = res["user"]["id"]
@@ -276,7 +276,7 @@ def run_tests():
     assert status == 200 and (res.get("success") or res.get("ok")), f"Archive staff failed: {res}"
 
     # Try logging in with archived staff credentials
-    status, res = request("/api/login", "POST", {"username": "staff", "password": "staff"})
+    status, res = request("/api/login", "POST", {"username": "staff", "password": "staff123"})
     assert status in (401, 403), f"Archived staff should not be able to log in, got {status}: {res}"
 
     # Verify tasks and messages still retain staff info in SQLite
@@ -319,7 +319,7 @@ def run_tests():
     assert status == 200 and (res.get("success") or res.get("ok")), f"Restore staff failed: {res}"
 
     # Verify restored staff can login again
-    status, res = request("/api/login", "POST", {"username": "staff", "password": "staff"})
+    status, res = request("/api/login", "POST", {"username": "staff", "password": "staff123"})
     assert status == 200, f"Restored staff login failed: {res}"
     print("PASS: TEST 12 - Staff restored and successfully authenticated.")
     passed += 1

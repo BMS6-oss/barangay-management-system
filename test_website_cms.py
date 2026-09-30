@@ -96,7 +96,7 @@ class BMSWebsiteCMSTests(unittest.TestCase):
 
     # ================= 2. ADMIN OFFICIALS CRUD =================
     def test_04_admin_officials_crud_and_reorder(self):
-        admin_token = self._login("admin", "admin")
+        admin_token = self._login("admin", "admin123")
 
         # 1. List
         code, officials = self._request("/api/admin/officials?status=all", token=admin_token)
@@ -164,7 +164,7 @@ class BMSWebsiteCMSTests(unittest.TestCase):
 
     # ================= 3. ADMIN GALLERY CRUD =================
     def test_05_admin_gallery_crud(self):
-        admin_token = self._login("admin", "admin")
+        admin_token = self._login("admin", "admin123")
 
         # 1. Create photo
         gallery_payload = {
@@ -208,7 +208,7 @@ class BMSWebsiteCMSTests(unittest.TestCase):
 
     # ================= 4. WEBSITE SETTINGS =================
     def test_06_website_settings(self):
-        admin_token = self._login("admin", "admin")
+        admin_token = self._login("admin", "admin123")
 
         # 1. Get current settings
         code, settings = self._request("/api/admin/website-settings", token=admin_token)
@@ -242,7 +242,7 @@ class BMSWebsiteCMSTests(unittest.TestCase):
     # ================= 5. RESIDENT PROFILE PHOTO =================
     def test_07_resident_profile_photo_security_and_storage(self):
         # 1. Login as resident (resident)
-        res_token = self._login("resident", "resident")
+        res_token = self._login("resident", "resident123")
 
         # 2. Upload profile photo
         code, upload_res = self._request("/api/resident/profile-photo", method="POST", data={"photo": TINY_PNG_BASE64}, token=res_token)
@@ -283,7 +283,7 @@ class BMSWebsiteCMSTests(unittest.TestCase):
 
     # ================= 6. ROLE PERMISSIONS & VALIDATION =================
     def test_08_role_permissions_and_validation(self):
-        res_token = self._login("resident", "resident")
+        res_token = self._login("resident", "resident123")
 
         # Resident attempting to modify officials must get 403 Forbidden
         code, err = self._request("/api/admin/officials", method="POST", data={"name": "Fake Official", "position": "Captain"}, token=res_token)
@@ -298,7 +298,7 @@ class BMSWebsiteCMSTests(unittest.TestCase):
         self.assertEqual(code, 403)
 
         # Admin uploading invalid file (not an image) must get 400 Bad Request
-        admin_token = self._login("admin", "admin")
+        admin_token = self._login("admin", "admin123")
         bad_base64 = "data:text/plain;base64," + base64.b64encode(b"hello text file").decode("utf-8")
         code, err = self._request("/api/admin/officials", method="POST", data={"name": "Bad Image", "position": "Staff", "photo": bad_base64}, token=admin_token)
         self.assertEqual(code, 400)

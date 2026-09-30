@@ -50,7 +50,7 @@ print("=======================================================\n")
 
 # Start server tests
 # First, log in as admin
-status, admin_body = req("/api/login", "POST", {"username": "admin", "password": "admin"})
+status, admin_body = req("/api/login", "POST", {"username": "admin", "password": "admin123"})
 if status != 200 or not admin_body.get("token"):
     print(f"Admin login failed: {status} {admin_body}")
     exit(1)

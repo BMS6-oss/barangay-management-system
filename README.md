@@ -8,7 +8,7 @@ A robust, lightweight, and modern Barangay Management System providing resident 
 
 - **Backend:** Python standard-library `http.server.ThreadingHTTPServer` (`server.py`) serving both REST JSON APIs and the frontend static assets.
 - **Frontend:** Single-page interface in `index.html` with vanilla JavaScript (`sqlite-api.js`), CSS styling, and responsive layout.
-- **Database:** SQLite with automatic startup migration (`init_db()`), schema verification, and indexes. Configured via `BMS_DATABASE_PATH`.
+- **Database:** SQLite for local development, PostgreSQL for production when `DATABASE_URL` is provided. The app keeps SQLite as the local fallback while making PostgreSQL the authoritative production database.
 - **Runtime:** Python 3.10+ (pure standard library + optional `Pillow` for server-side watermark processing).
 - **Deployment:** Docker-containerized, Linux-compatible, and optimized for Render (with Persistent Disk).
 
@@ -128,6 +128,7 @@ The repository includes a ready-to-use Render Blueprint (`render.yaml`).
    - `BMS_HOST`: `0.0.0.0`
    - `BMS_AUTO_OPEN_BROWSER`: `false`
    - `BMS_REQUIRE_HTTPS`: `true`
+   - `DATABASE_URL`: `postgresql://...` (provided automatically by the Render Postgres service)
    - `BMS_DATABASE_PATH`: `/data/bms.sqlite3`
    - `APP_URL`: `https://your-service-name.onrender.com`
 4. Under **Disks**, add a Persistent Disk:
@@ -141,13 +142,16 @@ The repository includes a ready-to-use Render Blueprint (`render.yaml`).
 
 ## 🗄️ Database Architecture & Persistence
 
-### SQLite with Persistent Disk
-The BMS uses an optimized SQLite database with Write-Ahead Logging (WAL) and foreign keys enabled.
-- In Docker/Render, data is persisted by attaching a persistent disk mounted to `/data` and setting:
-  ```env
-  BMS_DATABASE_PATH=/data/bms.sqlite3
-  ```
-- All resident records, certificates, requests, announcements, audit logs, and user accounts are preserved across restarts and container redeployments.
+### Local SQLite Development
+The BMS keeps an optimized SQLite database for local development with Write-Ahead Logging (WAL) and foreign keys enabled.
+- Local machines continue to use the SQLite file at `bms.sqlite3` unless a PostgreSQL connection string is configured.
+- In Docker/Render, the app can also use a persistent SQLite file mounted at `/data/bms.sqlite3` if you are not yet using Postgres.
+
+### Production PostgreSQL (Render)
+When `DATABASE_URL` is present, the app switches to PostgreSQL and treats it as the authoritative production database.
+- Local SQLite stays untouched unless you explicitly run a migration or configure a different path.
+- Render should define `DATABASE_URL` from the managed Postgres service in the environment.
+- The migration tool in `scripts/migrate_to_postgres.py` is safe by default and refuses to run against populated PostgreSQL tables unless `--force` is supplied. With `--force`, it merges rows and leaves records that conflict with existing unique keys unchanged.
 
 ### Schema Migrations
 The server automatically runs safe, non-destructive schema migrations on startup via `init_db()` in `server.py`:
@@ -156,8 +160,8 @@ The server automatically runs safe, non-destructive schema migrations on startup
 - Migrates existing accounts to verified status without deleting user records.
 - Preserves all existing data.
 
-### Future PostgreSQL Migration
-The application architecture separates data persistence behind the `db()` context manager. `DATABASE_URL` is reserved in configuration for external PostgreSQL connection strings if future horizontal multi-instance scaling is required.
+### PostgreSQL + SQLite Hybrid Model
+The application architecture separates data persistence behind the `db()` context manager. `DATABASE_URL` is the production switch for PostgreSQL, while local development continues to use SQLite by default. This keeps the local environment stable while making the Render deployment production-ready.
 
 ---
 
